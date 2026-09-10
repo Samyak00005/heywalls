@@ -1,0 +1,97 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=Work+Sans:wght@400;500;600&display=swap');
+@import "tailwindcss";
+
+/*
+  HeyWalls design tokens.
+  One theme only — no light/dark variants.
+  Every value here maps 1:1 to HeyWalls-Design-System.md.
+  Nothing outside this file should introduce a new color, font size, or spacing value.
+*/
+
+@theme {
+  /* Color */
+  --color-bg: #EEEAE2;
+  --color-surface: #E4DFD2;
+  --color-ink: #201E1B;
+  --color-ink-soft: #6B6459;
+  --color-line: #C9C2B4;
+  --color-accent: #3E5641;
+  --color-accent-2: #A6553C;
+  --color-accent-contrast: #F4F1E9;
+
+  /* Type */
+  --font-display: 'Fraunces', serif;
+  --font-ui: 'Work Sans', sans-serif;
+
+  --text-display: 38px;
+  --text-display--line-height: 1.05;
+  --text-h1: 28px;
+  --text-h1--line-height: 1.05;
+  --text-h2: 20px;
+  --text-h2--line-height: 1.3;
+  --text-h3: 16px;
+  --text-h3--line-height: 1.3;
+  --text-body: 15px;
+  --text-body--line-height: 1.5;
+  --text-body-sm: 13px;
+  --text-body-sm--line-height: 1.5;
+  --text-label: 12px;
+  --text-label--line-height: 1.4;
+
+  /* Spacing (8px grid). Named to avoid colliding with Tailwind's own
+     numeric spacing scale (p-4, gap-8, etc. are Tailwind's defaults and
+     do NOT match our scale past the 16px step) — always use these. */
+  --spacing-xs: 4px;   /* space-1 */
+  --spacing-sm: 8px;   /* space-2 */
+  --spacing-md: 12px;  /* space-3 */
+  --spacing-lg: 16px;  /* space-4 — card padding, always */
+  --spacing-xl: 24px;  /* space-5 */
+  --spacing-2xl: 32px; /* space-6 */
+  --spacing-3xl: 48px; /* space-7 — section gap mobile, gutter desktop */
+  --spacing-4xl: 64px; /* space-8 — section gap desktop */
+  --spacing-5xl: 96px; /* space-9 — hero breathing room, desktop only */
+
+  /* Radius */
+  --radius-sm: 2px;
+  --radius-md: 3px;
+  --radius-lg: 4px;
+
+  /* Layout */
+  --container-max: 1200px;
+  --breakpoint-desktop: 720px;
+}
+
+@media (min-width: 720px) {
+  @theme {
+    --text-display: 52px;
+  }
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-ui);
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
+}
+
+h1, h2, h3, .font-display {
+  font-family: var(--font-display);
+}
+
+/* The one shadow in the whole system — hung frames + modals only. */
+.shadow-hung {
+  box-shadow: 0 6px 16px rgba(32, 30, 27, 0.14);
+}
+
+.container-page {
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--spacing-lg);
+}
+
+@media (min-width: 720px) {
+  .container-page {
+    padding-inline: var(--spacing-3xl);
+  }
+}
