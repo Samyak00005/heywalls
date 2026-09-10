@@ -39,5 +39,7 @@ npm run dev
 
 1. Create a free project at [supabase.com](https://supabase.com)
 2. Copy the project URL + anon key into `.env`
-3. Table migrations land in Phase 2 — schema is documented in
-   `HeyWalls-Master-Plan.md`
+3. In the Supabase SQL Editor, run `supabase/migrations/0001_init.sql`,
+   then `supabase/seed.sql` — this creates the tables and adds sample
+   curated wallpapers so the site isn't empty
+4. Restart `npm run dev` — Home and Explore should now show real data

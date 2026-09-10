@@ -1,18 +1,23 @@
+import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
+import { ErrorState, LoadingState } from '../components/common/DataState.jsx'
 import SwatchTag from '../components/wallpaper/SwatchTag.jsx'
 import WallpaperGrid from '../components/wallpaper/WallpaperGrid.jsx'
-import {
-  categories,
-  communityWallpapers,
-  placeholderWallpapers,
-} from '../utils/placeholderData.js'
+import { useCategories } from '../hooks/useCategories.js'
+import { useWallpapers } from '../hooks/useWallpapers.js'
 
-// The 6 wallpapers "hung" in the hero — a one-off visual moment, not a
-// reusable grid, which is why it doesn't use WallpaperCard.
-const hung = placeholderWallpapers.slice(0, 6)
 const rotations = ['-2deg', '1.5deg', '-1deg', '2deg', '-1.5deg', '1deg']
 
 export default function Home() {
+  const { wallpapers, loading, error } = useWallpapers()
+  const { categories } = useCategories()
+
+  // "Hung gallery" strip and the community section both pull from the same
+  // live dataset for now — Phase 4 will split this by uploader_id once
+  // real user uploads exist alongside curated content.
+  const hung = useMemo(() => wallpapers.slice(0, 6), [wallpapers])
+  const spotlight = useMemo(() => wallpapers.slice(6, 10), [wallpapers])
+
   return (
     <div>
       <section className="container-page pt-2xl md:pt-5xl pb-xl md:pb-3xl">
@@ -37,50 +42,67 @@ export default function Home() {
         </div>
       </section>
 
-      <div className="flex gap-md md:gap-lg overflow-x-auto container-page pb-3xl">
-        {hung.map((w, i) => (
-          <div
-            key={w.id}
-            className="shrink-0 bg-surface p-sm pb-xl rounded-sm shadow-hung"
-            style={{ transform: `rotate(${rotations[i]})` }}
-          >
-            <img
-              src={w.imageUrl}
-              alt={w.title}
-              width={w.orientation === 'phone' ? 130 : 190}
-              height={w.orientation === 'phone' ? 190 : 130}
-              className="rounded-sm block"
-            />
-            <p className="text-label text-ink-soft text-center mt-sm">
-              {w.category}
-            </p>
+      {error && (
+        <div className="container-page pb-3xl">
+          <ErrorState error={error} />
+        </div>
+      )}
+
+      {!error && loading && (
+        <div className="container-page pb-3xl">
+          <LoadingState />
+        </div>
+      )}
+
+      {!error && !loading && (
+        <>
+          <div className="flex items-start gap-md md:gap-lg overflow-x-auto container-page pb-3xl">
+            {hung.map((w, i) => (
+              <Link
+                key={w.id}
+                to={`/wallpaper/${w.id}`}
+                className="shrink-0 bg-surface p-sm pb-xl rounded-sm shadow-hung block"
+                style={{ transform: `rotate(${rotations[i]})` }}
+              >
+                <img
+                  src={w.imageUrl}
+                  alt={w.title}
+                  width={w.orientation === 'phone' ? 140 : 220}
+                  height={w.orientation === 'phone' ? 249 : 124}
+                  className="rounded-sm block"
+                />
+                <p className="text-label text-ink-soft text-center mt-sm">
+                  {w.category}
+                </p>
+              </Link>
+            ))}
           </div>
-        ))}
-      </div>
 
-      <section className="container-page pb-3xl md:pb-4xl">
-        <div className="flex items-baseline justify-between mb-lg">
-          <h2 className="font-display text-h2">Pick a mood</h2>
-          <span className="text-label text-ink-soft">
-            {categories.length} categories
-          </span>
-        </div>
-        <div className="flex flex-wrap gap-sm">
-          {categories.map((c) => (
-            <Link key={c} to="/explore">
-              <SwatchTag label={c} />
-            </Link>
-          ))}
-        </div>
-      </section>
+          <section className="container-page pb-3xl md:pb-4xl">
+            <div className="flex items-baseline justify-between mb-lg">
+              <h2 className="font-display text-h2">Pick a mood</h2>
+              <span className="text-label text-ink-soft">
+                {categories.length} categories
+              </span>
+            </div>
+            <div className="flex flex-wrap gap-sm">
+              {categories.map((c) => (
+                <Link key={c.id} to={`/category/${c.slug}`}>
+                  <SwatchTag label={c.name} />
+                </Link>
+              ))}
+            </div>
+          </section>
 
-      <section className="container-page pb-3xl md:pb-4xl">
-        <div className="flex items-baseline justify-between mb-lg">
-          <h2 className="font-display text-h2">From the community</h2>
-          <span className="text-label text-ink-soft">updated daily</span>
-        </div>
-        <WallpaperGrid wallpapers={communityWallpapers} />
-      </section>
+          <section className="container-page pb-3xl md:pb-4xl">
+            <div className="flex items-baseline justify-between mb-lg">
+              <h2 className="font-display text-h2">Fresh on HeyWalls</h2>
+              <span className="text-label text-ink-soft">updated daily</span>
+            </div>
+            <WallpaperGrid wallpapers={spotlight} />
+          </section>
+        </>
+      )}
 
       <section className="container-page pb-3xl md:pb-4xl">
         <div className="border border-dashed border-ink-soft rounded-lg p-xl md:p-2xl">

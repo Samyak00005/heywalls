@@ -48,6 +48,19 @@ cover.
 
 **Status:** builds clean, lints clean, visually confirmed against the theme
 
+**Refinements (after live testing on Vercel)**
+- Fixed a layout bug: mixing 16:9 desktop and 9:16 phone cards in a regular
+  CSS grid stretched each row to the tallest item, leaving a large empty
+  gap under shorter cards
+- `WallpaperGrid` switched from a row-based grid to a CSS-columns masonry
+  ("river") layout — each column flows independently, no more gaps
+- `WallpaperCard` now uses fixed ratios: 16:9 for desktop, 9:16 for phone
+- Same stretch bug existed in the Home hero "hung gallery" (flex default
+  `align-items: stretch`) — fixed with `items-start`
+- Added `DownloadButton` — real cross-origin download via blob fetch (not
+  just opening the image in a new tab), shown on every card
+- Installed `lucide-react` for icons
+
 ---
 
 ## Phase 2 — Database & real data ⏳ next
@@ -64,6 +77,45 @@ cover.
 
 **Blocked on:** you creating a free Supabase project and adding the keys to
 `.env` (see README)
+
+---
+
+## Phase 2 — Database & real data ✅
+
+**Added**
+- `supabase/migrations/0001_init.sql` — creates `profiles`, `categories`,
+  `wallpapers`, `wallpaper_categories`, with RLS enabled and public-read
+  policies (write policies land in Phase 4/5 alongside auth + roles)
+- `supabase/seed.sql` — seeds the 6 categories and 16 curated wallpapers
+  (same content as the old placeholder data, now in the real database)
+- `src/hooks/useWallpapers.js`, `useWallpaper.js`, `useCategories.js` —
+  fetch from Supabase, replacing `placeholderData.js` (deleted)
+- `src/lib/wallpaperMapper.js` — shared mapping from Supabase's joined
+  rows to the flat shape components expect
+- `src/components/common/DataState.jsx` — shared loading/error states,
+  so every data-fetching page looks and behaves the same way
+- **New pages:** `WallpaperDetail` (`/wallpaper/:id`) with a "more like
+  this" section, and `Category` (`/category/:slug`)
+- `WallpaperCard` now links to its detail page
+- `DownloadButton` got a `variant` prop (`icon` for cards, `primary` for
+  the detail page) instead of overriding its styles from outside
+
+**Changed**
+- Home's "From the community" section renamed to "Fresh on HeyWalls" —
+  it's pulling from the same curated dataset as everything else right now
+  (no real uploader accounts exist yet), so the old label overstated it
+- Explore's filters now run against real Supabase data instead of a local
+  array (still filtered client-side — the catalog is small enough that
+  this is simpler than server-side filtering for now)
+
+**Known items**
+- One lint warning in `useWallpaper.js` (`setState` inside effect) — an
+  intentional reset-on-id-change pattern, not a bug
+- This phase can't be tested from my side — it depends on your Supabase
+  project. Run the migration + seed SQL, add your keys to `.env`, then
+  check `/`, `/explore`, `/category/:slug`, and `/wallpaper/:id`
+
+**Status:** builds clean; needs your Supabase project connected to verify live
 
 ---
 

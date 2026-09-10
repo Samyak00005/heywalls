@@ -1,20 +1,31 @@
+import { Link } from 'react-router-dom'
+import DownloadButton from './DownloadButton.jsx'
+
 /**
- * Flat card — per the design system, grid cards use a border, not the
- * "hung frame" shadow (that's reserved for the hero moment on Home).
+ * Fixed ratios by orientation — this is what makes the masonry grid in
+ * WallpaperGrid line up cleanly instead of leaving gaps. 'both' wallpapers
+ * default to the desktop ratio for the thumbnail; the full-size page is
+ * where the actual phone/desktop variants get chosen.
  */
 export default function WallpaperCard({ wallpaper }) {
-  const { title, imageUrl, orientation, category, uploader } = wallpaper
-  const aspect = orientation === 'phone' ? 'aspect-[3/4]' : 'aspect-[4/3]'
+  const { id, title, imageUrl, orientation, category, uploader } = wallpaper
+  const aspect = orientation === 'phone' ? 'aspect-[9/16]' : 'aspect-video'
+  const filename = `heywalls-${title.toLowerCase().replace(/\s+/g, '-')}.jpg`
 
   return (
-    <div className="border border-line rounded-md overflow-hidden bg-surface">
-      <img
-        src={imageUrl}
-        alt={title}
-        className={`w-full ${aspect} object-cover block`}
-      />
+    <div className="break-inside-avoid mb-md md:mb-lg border border-line rounded-md overflow-hidden bg-surface">
+      <Link to={`/wallpaper/${id}`} className={`relative block ${aspect}`}>
+        <img
+          src={imageUrl}
+          alt={title}
+          className="w-full h-full object-cover block"
+        />
+        <DownloadButton imageUrl={imageUrl} filename={filename} />
+      </Link>
       <div className="p-lg flex items-center justify-between">
-        <span className="text-body-sm text-ink truncate">{title}</span>
+        <Link to={`/wallpaper/${id}`} className="text-body-sm text-ink truncate">
+          {title}
+        </Link>
         <span className="text-label text-ink-soft shrink-0 ml-sm">
           {uploader ? `@${uploader}` : category}
         </span>
