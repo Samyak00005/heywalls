@@ -1,22 +1,22 @@
-import { useMemo } from 'react'
-import { Link } from 'react-router-dom'
-import { ErrorState, LoadingState } from '../components/common/DataState.jsx'
-import SwatchTag from '../components/wallpaper/SwatchTag.jsx'
-import WallpaperGrid from '../components/wallpaper/WallpaperGrid.jsx'
-import { useCategories } from '../hooks/useCategories.js'
-import { useWallpapers } from '../hooks/useWallpapers.js'
+import { useMemo } from "react";
+import { Link } from "react-router-dom";
+import { ErrorState, LoadingState } from "../components/common/DataState.jsx";
+import SwatchTag from "../components/wallpaper/SwatchTag.jsx";
+import WallpaperGrid from "../components/wallpaper/WallpaperGrid.jsx";
+import { useCategories } from "../hooks/useCategories.js";
+import { useWallpapers } from "../hooks/useWallpapers.js";
 
-const rotations = ['-2deg', '1.5deg', '-1deg', '2deg', '-1.5deg', '1deg']
+const rotations = ["-2deg", "1.5deg", "-1deg", "2deg", "-1.5deg", "1deg"];
 
 export default function Home() {
-  const { wallpapers, loading, error } = useWallpapers()
-  const { categories } = useCategories()
+  const { wallpapers, loading, error } = useWallpapers();
+  const { categories } = useCategories();
 
   // "Hung gallery" strip and the community section both pull from the same
   // live dataset for now — Phase 4 will split this by uploader_id once
   // real user uploads exist alongside curated content.
-  const hung = useMemo(() => wallpapers.slice(0, 6), [wallpapers])
-  const spotlight = useMemo(() => wallpapers.slice(6, 10), [wallpapers])
+  const hung = useMemo(() => wallpapers.slice(0, 6), [wallpapers]);
+  const spotlight = useMemo(() => wallpapers.slice(6, 10), [wallpapers]);
 
   return (
     <div>
@@ -26,8 +26,8 @@ export default function Home() {
           Walls worth living with.
         </h1>
         <p className="text-body text-ink-soft max-w-[340px] mb-xl">
-          Wallpapers curated by us, uploaded by everyone else. Pick a mood,
-          grab it for your phone or your desktop, done.
+          Wallpapers curated by us, uploaded by everyone else. Pick a mood, grab
+          it for your phone or your desktop, done.
         </p>
         <div className="flex gap-sm">
           <Link
@@ -67,8 +67,8 @@ export default function Home() {
                 <img
                   src={w.imageUrl}
                   alt={w.title}
-                  width={w.orientation === 'phone' ? 140 : 220}
-                  height={w.orientation === 'phone' ? 249 : 124}
+                  width={w.orientation === "phone" ? 140 : 220}
+                  height={w.orientation === "phone" ? 249 : 124}
                   className="rounded-sm block"
                 />
                 <p className="text-label text-ink-soft text-center mt-sm">
@@ -110,8 +110,7 @@ export default function Home() {
             Got a wall worth sharing?
           </h3>
           <p className="text-body-sm text-ink-soft max-w-[380px] mb-lg">
-            Drop your desktop or phone wallpaper and let the community grab
-            it.
+            Drop your desktop or phone wallpaper and let the community grab it.
           </p>
           <button className="bg-accent text-accent-contrast rounded-md px-lg py-sm text-body font-medium">
             Upload a wallpaper
@@ -119,5 +118,5 @@ export default function Home() {
         </div>
       </section>
     </div>
-  )
+  );
 }

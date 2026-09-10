@@ -1,4 +1,4 @@
-import { Download } from 'lucide-react'
+import { Download } from "lucide-react";
 
 /**
  * Triggers a real "Save As" download, not just opening the image in a new
@@ -10,32 +10,32 @@ import { Download } from 'lucide-react'
  */
 export default function DownloadButton({
   imageUrl,
-  filename = 'wallpaper.jpg',
-  variant = 'icon',
+  filename = "wallpaper.jpg",
+  variant = "icon",
 }) {
   async function handleDownload(e) {
-    e.preventDefault()
-    e.stopPropagation()
+    e.preventDefault();
+    e.stopPropagation();
 
     try {
-      const response = await fetch(imageUrl, { mode: 'cors' })
-      const blob = await response.blob()
-      const objectUrl = URL.createObjectURL(blob)
+      const response = await fetch(imageUrl, { mode: "cors" });
+      const blob = await response.blob();
+      const objectUrl = URL.createObjectURL(blob);
 
-      const link = document.createElement('a')
-      link.href = objectUrl
-      link.download = filename
-      document.body.appendChild(link)
-      link.click()
-      link.remove()
-      URL.revokeObjectURL(objectUrl)
+      const link = document.createElement("a");
+      link.href = objectUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(objectUrl);
     } catch {
       // Fallback if a future CDN blocks CORS — at least gets the user to the image.
-      window.open(imageUrl, '_blank')
+      window.open(imageUrl, "_blank");
     }
   }
 
-  if (variant === 'primary') {
+  if (variant === "primary") {
     return (
       <button
         type="button"
@@ -45,7 +45,7 @@ export default function DownloadButton({
         <Download size={16} strokeWidth={2} />
         Download
       </button>
-    )
+    );
   }
 
   return (
@@ -57,5 +57,5 @@ export default function DownloadButton({
     >
       <Download size={16} strokeWidth={2} />
     </button>
-  )
+  );
 }

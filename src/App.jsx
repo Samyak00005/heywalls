@@ -1,6 +1,6 @@
-import { BrowserRouter } from 'react-router-dom'
-import Layout from './components/common/Layout.jsx'
-import AppRoutes from './routes/AppRoutes.jsx'
+import { BrowserRouter } from "react-router-dom";
+import Layout from "./components/common/Layout.jsx";
+import AppRoutes from "./routes/AppRoutes.jsx";
 
 function App() {
   return (
@@ -9,7 +9,7 @@ function App() {
         <AppRoutes />
       </Layout>
     </BrowserRouter>
-  )
+  );
 }
 
-export default App
+export default App;
