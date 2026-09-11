@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import DownloadButton from './DownloadButton.jsx'
+import FavoriteButton from './FavoriteButton.jsx'
 
 /**
  * Fixed ratios by orientation — this is what makes the masonry grid in
@@ -20,7 +21,8 @@ export default function WallpaperCard({ wallpaper }) {
           alt={title}
           className="w-full h-full object-cover block"
         />
-        <DownloadButton imageUrl={imageUrl} filename={filename} />
+        <DownloadButton imageUrl={imageUrl} filename={filename} wallpaperId={id} />
+        <FavoriteButton wallpaperId={id} />
       </Link>
       <div className="p-lg flex items-center justify-between">
         <Link to={`/wallpaper/${id}`} className="text-body-sm text-ink truncate">

@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext.jsx'
+import { ADMIN_ONLY_LOGIN } from '../../lib/featureFlags.js'
+import { supabase } from '../../lib/supabaseClient.js'
 import PasswordInput from './PasswordInput.jsx'
 
 /**
@@ -8,7 +10,7 @@ import PasswordInput from './PasswordInput.jsx'
  * onSuccess: called after a successful sign-in/sign-up
  */
 export default function AuthForm({ mode, onSuccess, prefillEmail }) {
-  const { signIn, signUp } = useAuth()
+  const { signIn, signUp, signOut } = useAuth()
   const navigate = useNavigate()
   const [username, setUsername] = useState('')
   const [email, setEmail] = useState(prefillEmail || '')
@@ -30,9 +32,29 @@ export default function AuthForm({ mode, onSuccess, prefillEmail }) {
 
     if (mode === 'login') {
       const { data, error } = await signIn(email, password)
+      if (error) {
+        setLoading(false)
+        setError(error.message)
+        return
+      }
+
+      if (ADMIN_ONLY_LOGIN) {
+        const { data: profileRow } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', data.user.id)
+          .single()
+
+        if (profileRow?.role !== 'admin') {
+          await signOut()
+          setLoading(false)
+          setError('HeyWalls is in private beta right now — admin access only.')
+          return
+        }
+      }
+
       setLoading(false)
-      if (error) setError(error.message)
-      else onSuccess?.(data)
+      onSuccess?.(data)
       return
     }
 

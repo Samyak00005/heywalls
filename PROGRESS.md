@@ -195,6 +195,69 @@ project to run the new migration before auth will work live
 
 ---
 
-## Phase 4 — Upload & favorites (not started)
-## Phase 5 — Admin & moderation (not started)
+## Phase 4 — Upload & favorites ✅ (plus admin dashboard, pulled forward)
+
+**Why admin came early:** uploads need somewhere to be reviewed, so
+building Phase 4 without any moderation UI would mean pending uploads
+pile up with no way to act on them. Built a working slice of Phase 5
+alongside Phase 4 rather than leave that gap.
+
+**Admin**
+- `ADMIN_ONLY_LOGIN` flag in `src/lib/featureFlags.js` — while true, only
+  `profiles.role = 'admin'` accounts can sign in (signup still works,
+  for creating test accounts). Flip to `false` in Phase 6 for real launch.
+- `supabase/make_admin.sql` — one-time script to promote an account
+  (not a numbered migration — a personal data change, run once)
+- `.admin-theme` in `globals.css` — inverted dark background/text, same
+  accent colors. Wrapping the admin route tree in this class re-themes
+  every existing component automatically via the CSS variable cascade,
+  no per-component changes needed. This is the "different colors" ask.
+- `/admin` — dashboard with stats (total/pending/users)
+- `/admin/moderation` — approve/reject queue for pending uploads
+- `/admin/categories` — add/delete categories
+- `/admin/users` — promote/demote admin role
+- `AdminRoute` guard, `AdminLayout` wrapper
+
+**Upload**
+- `/upload` — title, description, orientation, category picker, drag-drop
+  image (`UploadDropzone`, client-validated: JPG/PNG, 15MB max)
+- Uploads go to Supabase Storage (`wallpapers` bucket), row inserted as
+  `pending` for regular users, `approved` immediately for admins
+- `/account/uploads` — see your own uploads and their status, using the
+  new "view own wallpapers regardless of status" RLS policy
+
+**Favorites**
+- `useFavorites` hook, `FavoriteButton` on every card and the detail page
+- `/account/favorites` — saved wallpapers
+
+**Downloads**
+- `DownloadButton` now logs to the `downloads` table and increments
+  `download_count` via an `increment_download_count` RPC — works for
+  guests too (nullable `user_id`)
+
+**Account Settings follow-up (from feedback)**
+- Now centered (missed this earlier — only auth pages got `AuthLayout`)
+- Added: change password (in-app, no email round-trip needed since
+  already authenticated), delete account, quick links to uploads/favorites
+- **Delete account** required a Supabase Edge Function
+  (`supabase/functions/delete-account`) — deleting a user needs the
+  service role key, which must never reach the browser, so this runs
+  server-side. Needs a manual `supabase functions deploy` — see README.
+
+**Other fixes from feedback**
+- Home's "Fresh on HeyWalls" now shows 5 wallpapers, not 4
+- Upload CTAs on Home now actually link somewhere (`/upload` if signed
+  in, `/login` if not) instead of being static buttons
+
+**New migrations:** `0004_own_wallpapers_visibility.sql`,
+`0005_phase4_and_admin.sql` (admin policies, favorites/downloads tables,
+download-count RPC), `0006_storage.sql` (wallpapers bucket + policies)
+
+**Status:** builds clean, lints clean (0 errors); needs the new
+migrations run, the admin account promoted via `make_admin.sql`, and the
+Edge Function deployed before everything works live
+
+---
+
+## Phase 5 — Admin & moderation (core pulled into Phase 4 — see above)
 ## Phase 6 — Polish & launch (not started)

@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext.jsx'
 export default function Navbar() {
   const { user, profile, signOut } = useAuth()
   const navigate = useNavigate()
+  const isAdmin = profile?.role === 'admin'
 
   async function handleSignOut() {
     await signOut()
@@ -23,8 +24,16 @@ export default function Navbar() {
           <Link to="/explore" className="hover:text-ink">
             Explore
           </Link>
-          <span className="cursor-default">Categories</span>
-          <span className="cursor-default">Upload</span>
+          {user && (
+            <Link to="/upload" className="hover:text-ink">
+              Upload
+            </Link>
+          )}
+          {isAdmin && (
+            <Link to="/admin" className="hover:text-ink">
+              Admin
+            </Link>
+          )}
         </nav>
 
         {user ? (

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { ErrorState, LoadingState } from '../components/common/DataState.jsx'
 import SwatchTag from '../components/wallpaper/SwatchTag.jsx'
 import WallpaperGrid from '../components/wallpaper/WallpaperGrid.jsx'
+import { useAuth } from '../context/AuthContext.jsx'
 import { useCategories } from '../hooks/useCategories.js'
 import { useWallpapers } from '../hooks/useWallpapers.js'
 
@@ -26,6 +27,7 @@ function pickHero(wallpapers, count = 5) {
 }
 
 export default function Home() {
+  const { user } = useAuth()
   const { wallpapers, loading, error } = useWallpapers()
   const { categories } = useCategories()
 
@@ -35,7 +37,7 @@ export default function Home() {
   const hung = useMemo(() => pickHero(wallpapers, 5), [wallpapers])
   const spotlight = useMemo(() => {
     const hungIds = new Set(hung.map((w) => w.id))
-    return wallpapers.filter((w) => !hungIds.has(w.id)).slice(0, 4)
+    return wallpapers.filter((w) => !hungIds.has(w.id)).slice(0, 5)
   }, [wallpapers, hung])
 
   return (
@@ -56,9 +58,12 @@ export default function Home() {
           >
             Explore wallpapers
           </Link>
-          <button className="border border-ink text-ink rounded-md px-lg py-sm text-body">
+          <Link
+            to={user ? '/upload' : '/login'}
+            className="border border-ink text-ink rounded-md px-lg py-sm text-body"
+          >
             Upload yours
-          </button>
+          </Link>
         </div>
       </section>
 
@@ -133,9 +138,12 @@ export default function Home() {
             Drop your desktop or phone wallpaper and let the community grab
             it.
           </p>
-          <button className="bg-accent text-accent-contrast rounded-md px-lg py-sm text-body font-medium">
+          <Link
+            to={user ? '/upload' : '/login'}
+            className="bg-accent text-accent-contrast rounded-md px-lg py-sm text-body font-medium inline-block"
+          >
             Upload a wallpaper
-          </button>
+          </Link>
         </div>
       </section>
     </div>

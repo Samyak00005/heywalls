@@ -21,6 +21,7 @@ export function mapWallpaperRow(row) {
     uploader: row.profiles?.username || null,
     downloadCount: row.download_count,
     createdAt: row.created_at,
+    status: row.status,
   }
 }
 

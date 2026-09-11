@@ -95,3 +95,14 @@ h1, h2, h3, .font-display {
     padding-inline: var(--spacing-3xl);
   }
 }
+
+/* Admin section — same accent colors (moss/rust), inverted neutrals.
+   Wrapping any subtree in this class re-themes every existing component
+   automatically, since utilities like bg-bg/text-ink read these vars. */
+.admin-theme {
+  --color-bg: #201F1B;
+  --color-surface: #2B2A24;
+  --color-ink: #F2EFE6;
+  --color-ink-soft: #A39C8C;
+  --color-line: #423F35;
+}

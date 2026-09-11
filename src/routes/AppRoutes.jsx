@@ -1,18 +1,25 @@
 import { Route, Routes } from 'react-router-dom'
+import AdminRoute from '../components/auth/AdminRoute.jsx'
 import ProtectedRoute from '../components/auth/ProtectedRoute.jsx'
+import AdminLayout from '../components/admin/AdminLayout.jsx'
 import AccountSettings from '../pages/AccountSettings.jsx'
 import Category from '../pages/Category.jsx'
 import Explore from '../pages/Explore.jsx'
+import Favorites from '../pages/Favorites.jsx'
 import ForgotPassword from '../pages/ForgotPassword.jsx'
 import Home from '../pages/Home.jsx'
 import Login from '../pages/Login.jsx'
+import MyUploads from '../pages/MyUploads.jsx'
 import Profile from '../pages/Profile.jsx'
 import Signup from '../pages/Signup.jsx'
 import UpdatePassword from '../pages/UpdatePassword.jsx'
+import Upload from '../pages/Upload.jsx'
 import WallpaperDetail from '../pages/WallpaperDetail.jsx'
+import AdminCategories from '../pages/admin/Categories.jsx'
+import AdminDashboard from '../pages/admin/Dashboard.jsx'
+import AdminModeration from '../pages/admin/Moderation.jsx'
+import AdminUsers from '../pages/admin/Users.jsx'
 
-// Phase 4+ will add Upload, My uploads, Favorites, and the /admin/*
-// routes here as each phase lands.
 export default function AppRoutes() {
   return (
     <Routes>
@@ -33,6 +40,71 @@ export default function AppRoutes() {
           <ProtectedRoute>
             <AccountSettings />
           </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/account/uploads"
+        element={
+          <ProtectedRoute>
+            <MyUploads />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/account/favorites"
+        element={
+          <ProtectedRoute>
+            <Favorites />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/upload"
+        element={
+          <ProtectedRoute>
+            <Upload />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin"
+        element={
+          <AdminRoute>
+            <AdminLayout>
+              <AdminDashboard />
+            </AdminLayout>
+          </AdminRoute>
+        }
+      />
+      <Route
+        path="/admin/moderation"
+        element={
+          <AdminRoute>
+            <AdminLayout>
+              <AdminModeration />
+            </AdminLayout>
+          </AdminRoute>
+        }
+      />
+      <Route
+        path="/admin/categories"
+        element={
+          <AdminRoute>
+            <AdminLayout>
+              <AdminCategories />
+            </AdminLayout>
+          </AdminRoute>
+        }
+      />
+      <Route
+        path="/admin/users"
+        element={
+          <AdminRoute>
+            <AdminLayout>
+              <AdminUsers />
+            </AdminLayout>
+          </AdminRoute>
         }
       />
     </Routes>

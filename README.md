@@ -39,14 +39,19 @@ npm run dev
 
 1. Create a free project at [supabase.com](https://supabase.com)
 2. Copy the project URL + anon key into `.env`
-3. In the Supabase SQL Editor, run `supabase/migrations/0001_init.sql`,
-   then `0002_auth_profile_trigger.sql`, then
-   `0003_profile_insert_policy.sql`, then `supabase/seed.sql` — this
-   creates the tables, the auto-profile trigger and its insert policy,
-   and sample curated wallpapers so the site isn't empty
-4. In Supabase Authentication settings, confirm whether "Confirm email" is
-   on or off — either works with this app, but it changes what happens
-   right after someone signs up (email confirmation step vs. immediate
-   sign-in)
-5. Restart `npm run dev` — Home and Explore should now show real data,
-   and you should be able to sign up / sign in from the navbar
+3. In the Supabase SQL Editor, run these in order:
+   `0001_init.sql` → `0002_auth_profile_trigger.sql` →
+   `0003_profile_insert_policy.sql` → `0004_own_wallpapers_visibility.sql` →
+   `0005_phase4_and_admin.sql` → `0006_storage.sql` → `seed.sql`
+4. Run `supabase/make_admin.sql` once to make your own account an admin
+   (it's hardcoded to username `samyak005` — edit if that's not you)
+5. Deploy the delete-account Edge Function (needed for the "Delete
+   account" button in settings):
+   ```
+   npx supabase login
+   npx supabase link --project-ref <your-project-ref>
+   npx supabase functions deploy delete-account
+   ```
+   No manual secrets needed — Supabase injects the URL/keys automatically.
+6. Restart `npm run dev` — Home and Explore should now show real data,
+   auth should work, and once you're an admin, `/admin` should load

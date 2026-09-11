@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { ErrorState, LoadingState } from '../components/common/DataState.jsx'
 import DownloadButton from '../components/wallpaper/DownloadButton.jsx'
+import FavoriteButton from '../components/wallpaper/FavoriteButton.jsx'
 import WallpaperGrid from '../components/wallpaper/WallpaperGrid.jsx'
 import { useWallpaper } from '../hooks/useWallpaper.js'
 import { useWallpapers } from '../hooks/useWallpapers.js'
@@ -73,11 +74,15 @@ export default function WallpaperDetail() {
             {wallpaper.uploader ? `Uploaded by @${wallpaper.uploader}` : 'Curated by HeyWalls'}
           </p>
 
-          <DownloadButton
-            imageUrl={wallpaper.fullImageUrl}
-            filename={filename}
-            variant="primary"
-          />
+          <div className="flex gap-sm">
+            <DownloadButton
+              imageUrl={wallpaper.fullImageUrl}
+              filename={filename}
+              wallpaperId={wallpaper.id}
+              variant="primary"
+            />
+            <FavoriteButton wallpaperId={wallpaper.id} variant="primary" />
+          </div>
         </div>
       </div>
 
