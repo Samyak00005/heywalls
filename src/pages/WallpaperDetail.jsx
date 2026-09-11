@@ -135,11 +135,19 @@ export default function WallpaperDetail() {
           </div>
 
           {/* Uploader */}
-          <p className="text-label text-ink-soft mb-xl">
-            {wallpaper.uploader
-              ? `Uploaded by @${wallpaper.uploader}`
-              : "Curated by HeyWalls"}
-          </p>
+          <div className="mb-xl">
+            {wallpaper.uploader ? (
+              <Link
+                to={`/profile/${wallpaper.uploader}`}
+                className="inline-flex flex-col text-label text-ink hover:underline"
+              >
+                <span>{wallpaper.uploaderDisplayName || `@${wallpaper.uploader}`}</span>
+                <span className="text-ink-soft mt-xs">@{wallpaper.uploader}</span>
+              </Link>
+            ) : (
+              <p className="text-label text-ink-soft">Curated by HeyWalls</p>
+            )}
+          </div>
 
           {/* =====================================================
               DESKTOP ACTIONS

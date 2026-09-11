@@ -14,7 +14,7 @@ const STATUS_LABEL = {
 }
 
 export default function MyUploads() {
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
   const [uploads, setUploads] = useState(null)
   const [error, setError] = useState(null)
   const [filters, setFilters] = useState(DEFAULT_LIBRARY_FILTERS)
@@ -65,6 +65,15 @@ export default function MyUploads() {
               <p className="text-body-sm text-ink-soft">
                 Your wallpapers, review status, and published work.
               </p>
+              {profile?.username && (
+                <Link
+                  to={`/profile/${profile.username}`}
+                  className="inline-flex flex-col mt-sm text-label text-ink hover:underline"
+                >
+                  <span>{profile.display_name || `@${profile.username}`}</span>
+                  <span className="text-ink-soft mt-xs">@{profile.username}</span>
+                </Link>
+              )}
               <p className="text-label text-ink-soft mt-sm">{filteredUploads.length} shown · {uploads.length} total</p>
             </div>
             <Link to="/upload" className="bg-accent text-accent-contrast rounded-md px-lg py-sm text-body-sm font-medium">

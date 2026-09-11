@@ -75,6 +75,46 @@ body {
   line-height: var(--text-body--line-height);
 }
 
+/* Global interaction polish. Keep the UI visually calm while making every
+   clickable control feel responsive. */
+button:not(:disabled) {
+  cursor: pointer;
+}
+
+button:not(:disabled):hover {
+  transform: translateY(-1px);
+}
+
+button:not(:disabled):active {
+  transform: translateY(0);
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+/* Text is part of the visual composition on HeyWalls, so it should not be
+   selectable accidentally while browsing. Form controls remain selectable
+   so users can edit/copy their own input. */
+body,
+body * {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+input,
+textarea,
+select,
+[contenteditable="true"] {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
 h1, h2, h3, .font-display {
   font-family: var(--font-display);
 }
@@ -392,4 +432,110 @@ button:disabled {
 .admin-form-control:focus {
   outline: 1px solid var(--color-ink);
   outline-offset: 1px;
+}
+
+/* Library search: reserve space for the icon so it never overlaps the text. */
+.library-search-input {
+  display: block;
+  min-width: 0;
+  padding-left: 40px;
+}
+
+.library-search-input::placeholder {
+  color: var(--color-ink-soft);
+  opacity: 1;
+}
+
+/* Wallpaper actions stay hidden until the specific card is hovered. On touch devices,
+   keep them visible because there is no hover state. */
+.wallpaper-card-actions {
+  opacity: 0;
+}
+
+.group:hover .wallpaper-card-actions,
+.group:focus-within .wallpaper-card-actions {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .wallpaper-card-actions {
+    opacity: 1;
+  }
+}
+
+/* Profile showcase rows stay on one horizontal row instead of becoming a masonry grid. */
+.profile-single-row,
+.profile-collection-row {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(150px, 1fr);
+  gap: var(--spacing-md);
+  overflow-x: auto;
+  padding-bottom: var(--spacing-sm);
+  scrollbar-width: thin;
+}
+
+.profile-single-row {
+  grid-auto-columns: minmax(170px, 1fr);
+}
+
+.profile-row-card {
+  min-width: 0;
+}
+
+.profile-row-card > article {
+  margin-bottom: 0;
+}
+
+.profile-collection-row {
+  grid-auto-columns: minmax(210px, 1fr);
+}
+
+.profile-collection-card {
+  min-width: 0;
+  display: block;
+  border: 1px solid var(--color-line);
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-lg);
+}
+
+.profile-bio-row {
+  margin-top: var(--spacing-sm);
+  padding-left: calc(80px + var(--spacing-lg));
+  max-width: 760px;
+}
+
+.profile-bio {
+  margin: 0;
+  line-height: 1.55;
+  overflow-wrap: break-word;
+}
+
+@media (min-width: 1100px) {
+  .profile-single-row {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-auto-columns: unset;
+    overflow-x: visible;
+  }
+
+  .profile-collection-row {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-auto-columns: unset;
+    overflow-x: visible;
+  }
+}
+
+@media (max-width: 719px) {
+  .profile-bio-row {
+    padding-left: 0;
+  }
+
+  .profile-single-row {
+    grid-auto-columns: minmax(145px, 42vw);
+  }
+
+  .profile-collection-row {
+    grid-auto-columns: minmax(200px, 72vw);
+  }
 }

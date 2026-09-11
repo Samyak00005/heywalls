@@ -259,5 +259,37 @@ Edge Function deployed before everything works live
 
 ---
 
+## Phase 11 — Global UI polish ✅
+
+- Added a calm, consistent hover/active response to interactive buttons.
+- Added keyboard-visible focus outlines for buttons, links, and form controls.
+- Disabled accidental text selection across the browsing UI while keeping
+  inputs, textareas, selects, and editable fields selectable.
+- Preserved existing component-specific hover states (including admin and
+  destructive actions) rather than replacing them with a global color.
+
+## Phase 12 — Account & profile improvements ✅
+
+- Added editable display name to Account settings alongside username and bio.
+- Signup now collects an optional display name and passes it to the existing profile trigger.
+- Public creator profiles now show display name, username, bio, published wallpaper count, and approved uploads.
+- Wallpaper detail uploader information now links to the creator profile and shows display name when available.
+- My Uploads now surfaces the signed-in creator identity with a link to the public profile.
+- Signed-in username in the desktop navbar now opens the public creator profile; Account settings remains available in the mobile account menu.
+- Public profile queries and wallpaper joins expose profile display name/username only; email remains private.
+- Reused migration `0011_profile_display_name.sql`; no additional database migration is required for this phase.
+
+**Status:** implementation complete; build verification requires installing project dependencies.
+
+---
+
 ## Phase 5 — Admin & moderation (core pulled into Phase 4 — see above)
 ## Phase 6 — Polish & launch (not started)
+
+## Phase 16.1 — Account edit/delete flow
+
+- Replaced View profile with Cancel on Edit profile and redirect to profile after cancel/save.
+- Profile save shows a success toast before navigating to the profile.
+- Tightened edit-profile form spacing.
+- Added password + DELETE confirmation modal for account deletion with Cancel.
+- Password is verified before invoking the account-deletion Edge Function.

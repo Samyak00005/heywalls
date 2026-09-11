@@ -37,12 +37,16 @@ export default function FavoriteButton({ wallpaperId, variant = 'icon' }) {
     )
   }
 
+  const iconClasses = variant === 'icon-static'
+    ? 'bg-bg/90 hover:bg-bg text-ink rounded-sm p-sm shadow-hung transition-colors'
+    : 'absolute top-sm left-sm bg-bg/90 hover:bg-bg text-ink rounded-sm p-sm shadow-hung transition-colors'
+
   return (
     <button
       type="button"
       onClick={handleClick}
       aria-label={active ? 'Remove from favorites' : 'Add to favorites'}
-      className="absolute top-sm left-sm bg-bg/90 hover:bg-bg text-ink rounded-sm p-sm shadow-hung transition-colors"
+      className={iconClasses}
     >
       <Heart size={16} fill={active ? 'currentColor' : 'none'} className={active ? 'text-accent-2' : ''} />
     </button>

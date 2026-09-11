@@ -4,7 +4,6 @@ import {
   Menu,
   X,
   Compass,
-  Upload,
   Heart,
   Image,
   FolderHeart,
@@ -50,11 +49,6 @@ export default function Navbar() {
     ...(user
       ? [
           {
-            to: "/upload",
-            label: "Upload",
-            icon: Upload,
-          },
-          {
             to: "/account/favorites",
             label: "Saved",
             icon: Heart,
@@ -76,7 +70,7 @@ export default function Navbar() {
       ? [
           {
             to: "/admin",
-            label: "Admin",
+            label: "Admin Dashboard",
             icon: ShieldCheck,
           },
         ]
@@ -126,7 +120,7 @@ export default function Navbar() {
           {/* Username */}
           {user && (
             <Link
-              to="/account/settings"
+              to={profile?.username ? `/profile/${profile.username}` : "/account/settings"}
               className="
                 hidden sm:inline
                 text-body-sm

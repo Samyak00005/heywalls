@@ -1,4 +1,4 @@
-import { Filter, RotateCcw, Search } from 'lucide-react'
+import { RotateCcw, Search } from 'lucide-react'
 
 const ORIENTATIONS = [
   { value: 'all', label: 'All devices' },
@@ -66,14 +66,12 @@ export default function LibraryFilters({
 
   return (
     <div className="mb-xl space-y-sm">
-      <div className="flex items-center gap-sm text-label text-ink-soft">
-        <Filter size={15} strokeWidth={1.8} />
-        <span>Filter wallpapers</span>
+      <div className="flex items-center justify-end min-h-[20px]">
         {hasFilters && (
           <button
             type="button"
             onClick={clear}
-            className="ml-auto inline-flex items-center gap-xs text-ink hover:underline"
+            className="inline-flex items-center gap-xs text-body-sm text-ink hover:underline"
           >
             <RotateCcw size={13} strokeWidth={1.8} />
             Clear filters
@@ -82,13 +80,18 @@ export default function LibraryFilters({
       </div>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-[minmax(260px,1fr)_170px_190px_170px] gap-sm">
-        <label className="relative block">
-          <Search size={16} strokeWidth={1.8} className="absolute left-md top-1/2 -translate-y-1/2 text-ink-soft pointer-events-none" />
+        <label className="relative block min-w-0">
+          <Search
+            size={16}
+            strokeWidth={1.8}
+            aria-hidden="true"
+            className="absolute left-md top-1/2 -translate-y-1/2 text-ink-soft pointer-events-none z-10"
+          />
           <input
             value={filters.query}
             onChange={(e) => update('query', e.target.value)}
             placeholder="Search title, category or uploader…"
-            className="admin-form-control w-full pl-[40px]"
+            className="admin-form-control library-search-input"
             aria-label="Search wallpapers"
           />
         </label>

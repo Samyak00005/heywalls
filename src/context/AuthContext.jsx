@@ -87,11 +87,13 @@ export function AuthProvider({ children }) {
     profile,
     loading,
     profileLoading,
-    signUp: (email, password, username) =>
+    signUp: (email, password, username, displayName) =>
       supabase.auth.signUp({
         email,
         password,
-        options: username ? { data: { username } } : undefined,
+        options: (username || displayName)
+          ? { data: { username, display_name: displayName } }
+          : undefined,
       }),
     signIn: (email, password) =>
       supabase.auth.signInWithPassword({ email, password }),

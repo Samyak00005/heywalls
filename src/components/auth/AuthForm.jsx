@@ -12,6 +12,7 @@ import PasswordInput from './PasswordInput.jsx'
 export default function AuthForm({ mode, onSuccess, prefillEmail }) {
   const { signIn, signUp, signOut } = useAuth()
   const navigate = useNavigate()
+  const [displayName, setDisplayName] = useState('')
   const [username, setUsername] = useState('')
   const [email, setEmail] = useState(prefillEmail || '')
   const [password, setPassword] = useState('')
@@ -58,7 +59,12 @@ export default function AuthForm({ mode, onSuccess, prefillEmail }) {
       return
     }
 
-    const { data, error } = await signUp(email, password, username || undefined)
+    const { data, error } = await signUp(
+      email,
+      password,
+      username.trim() || undefined,
+      displayName.trim() || undefined,
+    )
     setLoading(false)
 
     if (error) {
@@ -82,16 +88,29 @@ export default function AuthForm({ mode, onSuccess, prefillEmail }) {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-lg">
       {mode === 'signup' && (
-        <label className="flex flex-col gap-xs">
-          <span className="text-label text-ink-soft">Username</span>
-          <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder="Optional — we'll pick one if left blank"
-            className="bg-surface border border-line rounded-sm px-lg py-sm text-body"
-          />
-        </label>
+        <>
+          <label className="flex flex-col gap-xs">
+            <span className="text-label text-ink-soft">Name</span>
+            <input
+              type="text"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              placeholder="Your display name"
+              className="bg-surface border border-line rounded-sm px-lg py-sm text-body"
+            />
+          </label>
+
+          <label className="flex flex-col gap-xs">
+            <span className="text-label text-ink-soft">Username</span>
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Optional — we'll pick one if left blank"
+              className="bg-surface border border-line rounded-sm px-lg py-sm text-body"
+            />
+          </label>
+        </>
       )}
 
       <label className="flex flex-col gap-xs">

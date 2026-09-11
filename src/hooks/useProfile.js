@@ -23,7 +23,7 @@ export function useProfile(username) {
     async function load() {
       const { data, error: queryError } = await supabase
         .from('profiles')
-        .select('id, username, avatar_url, bio, created_at')
+        .select('id, username, display_name, avatar_url, bio, created_at')
         .eq('username', username)
         .single()
 

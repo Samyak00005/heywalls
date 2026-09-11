@@ -64,12 +64,16 @@ export default function DownloadButton({
     )
   }
 
+  const iconClasses = variant === 'icon-static'
+    ? 'bg-bg/90 hover:bg-bg text-ink rounded-sm p-sm shadow-hung transition-colors'
+    : 'absolute top-sm right-sm bg-bg/90 hover:bg-bg text-ink rounded-sm p-sm shadow-hung transition-colors'
+
   return (
     <button
       type="button"
       onClick={handleDownload}
       aria-label="Download wallpaper"
-      className="absolute top-sm right-sm bg-bg/90 hover:bg-bg text-ink rounded-sm p-sm shadow-hung transition-colors"
+      className={iconClasses}
     >
       <Download size={16} strokeWidth={2} />
     </button>
