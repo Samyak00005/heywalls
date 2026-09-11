@@ -1,5 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { LoadingState } from '../components/common/DataState.jsx'
+import LibraryFilters, { applyLibraryFilters, DEFAULT_LIBRARY_FILTERS } from '../components/wallpaper/LibraryFilters.jsx'
+import { useCategories } from '../hooks/useCategories.js'
 import WallpaperGrid from '../components/wallpaper/WallpaperGrid.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useFavorites } from '../hooks/useFavorites.js'
@@ -10,6 +12,8 @@ export default function Favorites() {
   const { user } = useAuth()
   const { favoriteIds, loading: favoritesLoading } = useFavorites()
   const [wallpapers, setWallpapers] = useState(null)
+  const [filters, setFilters] = useState(DEFAULT_LIBRARY_FILTERS)
+  const { categories } = useCategories()
 
   useEffect(() => {
     if (!user || favoritesLoading) return
@@ -24,6 +28,8 @@ export default function Favorites() {
       .then(({ data }) => setWallpapers((data || []).map(mapWallpaperRow)))
   }, [user, favoriteIds, favoritesLoading])
 
+  const filteredWallpapers = useMemo(() => applyLibraryFilters(wallpapers || [], filters), [wallpapers, filters])
+
   if (wallpapers === null) {
     return (
       <div className="container-page pt-xl pb-3xl">
@@ -34,13 +40,23 @@ export default function Favorites() {
 
   return (
     <div className="container-page pt-xl pb-3xl md:pb-4xl">
-      <h1 className="font-display text-h1 mb-xl">Favorites</h1>
-      {wallpapers.length === 0 ? (
+      <div className="flex flex-wrap items-end justify-between gap-lg mb-xl">
+        <div>
+          <h1 className="font-display text-h1">Favorites</h1>
+          <p className="text-body-sm text-ink-soft mt-sm">Your saved wallpapers.</p>
+        </div>
+        {wallpapers.length > 0 && <span className="text-label text-ink-soft">{filteredWallpapers.length} shown · {wallpapers.length} saved</span>}
+      </div>
+
+      {wallpapers.length > 0 && (
+        <LibraryFilters filters={filters} onChange={setFilters} categories={categories} />
+      )}
+      {filteredWallpapers.length === 0 ? (
         <p className="text-body-sm text-ink-soft py-xl">
-          Nothing saved yet — tap the heart on any wallpaper to save it here.
+          {wallpapers.length === 0 ? 'Nothing saved yet — tap the heart on any wallpaper to save it here.' : 'No favorites match these filters.'}
         </p>
       ) : (
-        <WallpaperGrid wallpapers={wallpapers} />
+        <WallpaperGrid wallpapers={filteredWallpapers} />
       )}
     </div>
   )

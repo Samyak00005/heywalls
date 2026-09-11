@@ -21,6 +21,7 @@ export function mapWallpaperRow(row) {
     resolution: row.width && row.height ? `${row.width} × ${row.height}` : null,
     category: categoryNames[0] || 'Uncategorized',
     categorySlugs,
+    categoryIds: joined.map((wc) => wc.category_id).filter(Boolean),
     uploader: row.profiles?.username || null,
     downloadCount: row.download_count,
     createdAt: row.created_at,
@@ -29,4 +30,4 @@ export function mapWallpaperRow(row) {
 }
 
 export const WALLPAPER_SELECT =
-  'id, title, description, image_url, thumbnail_url, orientation, width, height, download_count, created_at, profiles(username), wallpaper_categories(categories(name, slug))'
+  'id, title, description, image_url, thumbnail_url, orientation, width, height, download_count, created_at, profiles(username), wallpaper_categories(category_id, categories(name, slug))'

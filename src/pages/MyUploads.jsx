@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { LoadingState } from '../components/common/DataState.jsx'
+import LibraryFilters, { applyLibraryFilters, DEFAULT_LIBRARY_FILTERS } from '../components/wallpaper/LibraryFilters.jsx'
+import { useCategories } from '../hooks/useCategories.js'
 import { useAuth } from '../context/AuthContext.jsx'
 import { supabase } from '../lib/supabaseClient.js'
 import { mapWallpaperRow, WALLPAPER_SELECT } from '../lib/wallpaperMapper.js'
@@ -15,6 +17,9 @@ export default function MyUploads() {
   const { user } = useAuth()
   const [uploads, setUploads] = useState(null)
   const [error, setError] = useState(null)
+  const [filters, setFilters] = useState(DEFAULT_LIBRARY_FILTERS)
+  const [status, setStatus] = useState('all')
+  const { categories } = useCategories()
 
   useEffect(() => {
     let active = true
@@ -40,6 +45,8 @@ export default function MyUploads() {
     return () => { active = false }
   }, [user])
 
+  const filteredUploads = applyLibraryFilters(uploads || [], filters).filter((w) => status === 'all' || w.status === status)
+
   if (!uploads) {
     return (
       <div className="container-page pt-xl pb-3xl">
@@ -58,11 +65,21 @@ export default function MyUploads() {
               <p className="text-body-sm text-ink-soft">
                 Your wallpapers, review status, and published work.
               </p>
+              <p className="text-label text-ink-soft mt-sm">{filteredUploads.length} shown · {uploads.length} total</p>
             </div>
             <Link to="/upload" className="bg-accent text-accent-contrast rounded-md px-lg py-sm text-body-sm font-medium">
               Upload wallpaper
             </Link>
           </div>
+
+          <LibraryFilters
+            filters={filters}
+            onChange={setFilters}
+            categories={categories}
+            showStatus
+            status={status}
+            onStatusChange={setStatus}
+          />
 
           {error && (
             <p className="text-body-sm text-accent-2 mb-lg">{error.message}</p>
@@ -75,9 +92,13 @@ export default function MyUploads() {
                 Upload your first wallpaper
               </Link>
             </div>
+          ) : filteredUploads.length === 0 ? (
+            <div className="border border-line bg-surface rounded-md p-xl text-center">
+              <p className="text-body-sm text-ink-soft">No uploads match these filters.</p>
+            </div>
           ) : (
             <div className="grid grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-md lg:gap-lg items-start">
-              {uploads.map((w) =>
+              {filteredUploads.map((w) =>
                 w.orientation === 'phone' ? (
                   <PhoneUploadCard key={w.id} wallpaper={w} />
                 ) : (
