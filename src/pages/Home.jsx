@@ -42,8 +42,7 @@ export default function Home() {
 
   return (
     <div>
-      <section className="container-page pt-2xl md:pt-5xl pb-xl md:pb-3xl">
-        <p className="text-label text-ink-soft mb-sm">Curated + community</p>
+      <section className="container-page pt-lg md:pt-2xl pb-xl md:pb-3xl">
         <h1 className="font-display italic text-display max-w-[480px] mb-lg">
           Walls worth living with.
         </h1>
@@ -57,12 +56,6 @@ export default function Home() {
             className="bg-accent text-accent-contrast rounded-md px-lg py-sm text-body font-medium"
           >
             Explore wallpapers
-          </Link>
-          <Link
-            to={user ? '/upload' : '/login'}
-            className="border border-ink text-ink rounded-md px-lg py-sm text-body"
-          >
-            Upload yours
           </Link>
         </div>
       </section>
