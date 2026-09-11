@@ -3,9 +3,11 @@ import { Link, useNavigate } from "react-router-dom";
 import PasswordInput from "../components/auth/PasswordInput.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
 import { supabase } from "../lib/supabaseClient.js";
+import { useToast } from "../components/common/ToastContext.jsx";
 
 export default function AccountSettings() {
   const { user, profile, signOut, updatePassword, refreshProfile } = useAuth();
+  const { showToast } = useToast();
   const navigate = useNavigate();
 
   const [username, setUsername] = useState("");
@@ -55,6 +57,7 @@ export default function AccountSettings() {
       setUsername(data.username || "");
       setBio(data.bio || "");
       refreshProfile();
+      showToast("Account details updated.");
     }
   }
 
@@ -69,6 +72,7 @@ export default function AccountSettings() {
     else {
       setPwSaved(true);
       setNewPassword("");
+      showToast("Password updated successfully.");
     }
   }
 
@@ -89,6 +93,7 @@ export default function AccountSettings() {
       return;
     }
     await signOut();
+    showToast("Your account has been deleted.");
     navigate("/");
   }
 

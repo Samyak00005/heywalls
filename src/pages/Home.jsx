@@ -1,13 +1,43 @@
 import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { ErrorState, LoadingState } from '../components/common/DataState.jsx'
-import SwatchTag from '../components/wallpaper/SwatchTag.jsx'
+import { Camera, Film, Layers3, Leaf, Minus, Orbit, Palette, Sparkles } from 'lucide-react'
 import WallpaperGrid from '../components/wallpaper/WallpaperGrid.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useCategories } from '../hooks/useCategories.js'
 import { useWallpapers } from '../hooks/useWallpapers.js'
 
 const rotations = ['-2deg', '1.5deg', '-1deg', '2deg', '-1.5deg', '1deg']
+
+const moodIcons = {
+  abstract: Palette,
+  anime: Sparkles,
+  minimal: Minus,
+  nature: Leaf,
+  space: Orbit,
+  stock: Camera,
+  superhero: Film,
+  texture: Layers3,
+}
+
+function MoodCard({ category }) {
+  const Icon = moodIcons[category.slug] || Palette
+
+  return (
+    <Link
+      to={`/category/${category.slug}`}
+      className="group flex min-w-[118px] flex-1 items-center gap-md rounded-md border border-line bg-surface px-md py-md transition-all duration-200 hover:-translate-y-0.5 hover:border-ink-soft hover:shadow-hung"
+    >
+      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-line bg-bg text-ink-soft transition-colors group-hover:text-ink">
+        <Icon size={17} strokeWidth={1.7} />
+      </span>
+      <span className="min-w-0">
+        <span className="block truncate text-body-sm text-ink">{category.name}</span>
+        <span className="mt-xs block text-label text-ink-soft">Explore mood</span>
+      </span>
+    </Link>
+  )
+}
 
 /**
  * Curates a repeating hero rhythm: one 9:16 phone wallpaper beside two
@@ -174,11 +204,9 @@ export default function Home() {
                 {categories.length} categories
               </span>
             </div>
-            <div className="flex flex-wrap gap-sm">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-sm md:gap-md">
               {categories.map((c) => (
-                <Link key={c.id} to={`/category/${c.slug}`}>
-                  <SwatchTag label={c.name} />
-                </Link>
+                <MoodCard key={c.id} category={c} />
               ))}
             </div>
           </section>

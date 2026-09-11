@@ -96,6 +96,41 @@ h1, h2, h3, .font-display {
   }
 }
 
+/* Quiet, consistent interaction motion across the site. */
+a, button, input, textarea, select {
+  transition-property: color, background-color, border-color, opacity, box-shadow, transform;
+  transition-duration: 160ms;
+  transition-timing-function: ease-out;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+.toast-enter {
+  animation: toast-in 180ms ease-out both;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
 /* Admin section — same accent colors (moss/rust), inverted neutrals.
    Wrapping any subtree in this class re-themes every existing component
    automatically, since utilities like bg-bg/text-ink read these vars. */
@@ -293,7 +328,7 @@ h1, h2, h3, .font-display {
 
 .admin-wallpaper-thumb {
   width: 160px;
-  height: 92px;
+  height: 96px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -301,11 +336,6 @@ h1, h2, h3, .font-display {
   border: 1px solid var(--color-line);
   border-radius: var(--radius-sm);
   background: var(--color-bg);
-}
-
-.admin-wallpaper-thumb.is-phone {
-  width: 72px;
-  height: 104px;
 }
 
 .admin-wallpaper-thumb img {
@@ -336,11 +366,6 @@ h1, h2, h3, .font-display {
 
   .admin-wallpaper-thumb {
     width: 72px;
-    height: 52px;
-  }
-
-  .admin-wallpaper-thumb.is-phone {
-    width: 52px;
     height: 76px;
   }
 

@@ -106,7 +106,7 @@ export default function AdminWallpapers() {
       <div className="border border-line rounded-md overflow-hidden">
         {filtered.map((w) => (
           <div key={w.id} className="admin-wallpaper-row bg-surface border-b border-line last:border-b-0">
-            <Link to={`/wallpaper/${w.id}`} className={`admin-wallpaper-thumb shrink-0 ${w.orientation === 'phone' ? 'is-phone' : ''}`} aria-label={`View ${w.title}`}>
+            <Link to={`/wallpaper/${w.id}`} className="admin-wallpaper-thumb shrink-0" aria-label={`View ${w.title}`}>
               <img src={w.imageUrl} alt={w.title} />
             </Link>
 
@@ -114,7 +114,9 @@ export default function AdminWallpapers() {
               <Link to={`/wallpaper/${w.id}`} className="text-body-sm hover:underline block truncate">{w.title}</Link>
               <p className="text-label text-ink-soft mt-xs truncate">
                 {w.status} · {w.orientation === 'phone' ? 'Mobile · 9:16' : 'Desktop · 16:9'}
-                {w.resolution ? ` · ${w.resolution}` : ''}
+              </p>
+              <p className="text-label text-ink-soft mt-xs truncate">
+                Resolution: {w.resolution || 'Unavailable'}
               </p>
               {w.uploader && <p className="text-label text-ink-soft mt-xs truncate">@{w.uploader}</p>}
             </div>

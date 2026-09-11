@@ -2,10 +2,12 @@ import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import AuthForm from '../components/auth/AuthForm.jsx'
 import AuthLayout from '../components/auth/AuthLayout.jsx'
+import { useToast } from '../components/common/ToastContext.jsx'
 
 export default function Login() {
   const navigate = useNavigate()
   const location = useLocation()
+  const { showToast } = useToast()
   const [notice] = useState(location.state?.prefillEmail ? 'Sign in below to continue.' : null)
 
   return (
@@ -15,7 +17,10 @@ export default function Login() {
       <AuthForm
         mode="login"
         prefillEmail={location.state?.prefillEmail}
-        onSuccess={() => navigate('/')}
+        onSuccess={() => {
+          showToast('Welcome back to HeyWalls.')
+          navigate('/')
+        }}
       />
       <div className="flex flex-col gap-xs mt-lg text-body-sm text-ink-soft">
         <Link to="/forgot-password" className="hover:text-ink">

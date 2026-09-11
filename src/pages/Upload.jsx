@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import SwatchTag from '../components/wallpaper/SwatchTag.jsx'
 import UploadDropzone from '../components/upload/UploadDropzone.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
+import { useToast } from '../components/common/ToastContext.jsx'
 import { useCategories } from '../hooks/useCategories.js'
 import { supabase } from '../lib/supabaseClient.js'
 
@@ -10,6 +11,7 @@ const ORIENTATIONS = ['desktop', 'phone', 'both']
 
 export default function Upload() {
   const { user, profile } = useAuth()
+  const { showToast } = useToast()
   const { categories } = useCategories()
   const navigate = useNavigate()
 
@@ -90,6 +92,7 @@ export default function Upload() {
         )
       }
 
+      showToast(profile?.role === 'admin' ? 'Wallpaper added and published.' : 'Wallpaper added — pending review.')
       navigate('/account/uploads')
     } catch (err) {
       setError(err.message)

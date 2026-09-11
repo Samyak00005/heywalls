@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import AuthLayout from '../components/auth/AuthLayout.jsx'
 import PasswordInput from '../components/auth/PasswordInput.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
+import { useToast } from '../components/common/ToastContext.jsx'
 
 /**
  * Reached via the link in the password-reset email. Supabase parses the
@@ -11,6 +12,7 @@ import { useAuth } from '../context/AuthContext.jsx'
  */
 export default function UpdatePassword() {
   const { updatePassword } = useAuth()
+  const { showToast } = useToast()
   const navigate = useNavigate()
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -25,6 +27,7 @@ export default function UpdatePassword() {
     if (error) {
       setError(error.message)
     } else {
+      showToast('Password updated successfully.')
       navigate('/')
     }
   }

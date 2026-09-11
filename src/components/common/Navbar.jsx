@@ -14,9 +14,11 @@ import {
 } from "lucide-react";
 import logo from "../../assets/logo.png";
 import { useAuth } from "../../context/AuthContext.jsx";
+import { useToast } from "./ToastContext.jsx";
 
 export default function Navbar() {
   const { user, profile, signOut } = useAuth();
+  const { showToast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -25,7 +27,9 @@ export default function Navbar() {
 
   async function handleSignOut() {
     setMenuOpen(false);
-    await signOut();
+    const { error } = await signOut();
+    if (error) return;
+    showToast("You’ve been signed out.");
     navigate("/");
   }
 
@@ -297,8 +301,6 @@ export default function Navbar() {
                   text-body-sm
                   text-left
                   text-ink
-                  text-red-600
-                  font-medium
                   transition-all duration-200
 
                   hover:bg-red-600

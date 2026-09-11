@@ -74,14 +74,6 @@ export default function AdminDashboard() {
           <p className="text-label uppercase tracking-[0.08em] text-ink-soft mb-xs">Overview</p>
           <h1 className="font-display text-h1">Dashboard</h1>
         </div>
-        <div className="flex gap-sm">
-          <Link to="/admin/moderation" className="bg-accent text-accent-contrast rounded-md px-lg py-sm text-body-sm font-medium">
-            Open moderation
-          </Link>
-          <Link to="/admin/categories" className="border border-ink text-ink rounded-md px-lg py-sm text-body-sm">
-            Categories
-          </Link>
-        </div>
       </div>
 
       {error && <p className="text-body-sm text-accent-2 mb-lg">{error.message}</p>}
@@ -118,7 +110,7 @@ export default function AdminDashboard() {
                       <p className="text-body-sm truncate">{w.title}</p>
                       <p className="text-label text-ink-soft">
                         {w.status || 'unknown'} · {w.orientation === 'phone' ? 'Mobile' : 'Desktop'}
-                        {w.resolution ? ` · ${w.resolution}` : ''}
+                        {w.resolution ? ` · ${w.resolution}` : ' · Resolution unavailable'}
                       </p>
                     </div>
                     <Link to={`/wallpaper/${w.id}`} className="text-label text-ink underline shrink-0">
