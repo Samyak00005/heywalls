@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { LoadingState } from '../components/common/DataState.jsx'
+import AccountSidebar from '../components/common/AccountSidebar.jsx'
 import LibraryFilters, { applyLibraryFilters, DEFAULT_LIBRARY_FILTERS } from '../components/wallpaper/LibraryFilters.jsx'
 import { useCategories } from '../hooks/useCategories.js'
 import { useAuth } from '../context/AuthContext.jsx'
 import { supabase } from '../lib/supabaseClient.js'
 import { mapWallpaperRow, WALLPAPER_SELECT } from '../lib/wallpaperMapper.js'
+import OptimizedImage from '../components/wallpaper/OptimizedImage.jsx'
 
 const STATUS_LABEL = {
   pending: 'Pending review',
@@ -25,7 +27,7 @@ export default function MyUploads() {
     let active = true
     if (!user) return undefined
 
-    async function load() {
+    async function loadUploads() {
       const { data, error: queryError } = await supabase
         .from('wallpapers')
         .select(WALLPAPER_SELECT + ', status')
@@ -41,16 +43,19 @@ export default function MyUploads() {
       }
     }
 
-    load()
+
+    loadUploads()
     return () => { active = false }
   }, [user])
 
-  const filteredUploads = applyLibraryFilters(uploads || [], filters).filter((w) => status === 'all' || w.status === status)
+
+  const filteredUploads = applyLibraryFilters(uploads || [], filters)
+    .filter((w) => status === 'all' || w.status === status)
 
   if (!uploads) {
     return (
       <div className="container-page pt-xl pb-3xl">
-        <LoadingState label="Loading your uploads…" />
+        <LoadingState label="Loading your HeyWalls space…" />
       </div>
     )
   }
@@ -65,15 +70,6 @@ export default function MyUploads() {
               <p className="text-body-sm text-ink-soft">
                 Your wallpapers, review status, and published work.
               </p>
-              {profile?.username && (
-                <Link
-                  to={`/profile/${profile.username}`}
-                  className="inline-flex flex-col mt-sm text-label text-ink hover:underline"
-                >
-                  <span>{profile.display_name || `@${profile.username}`}</span>
-                  <span className="text-ink-soft mt-xs">@{profile.username}</span>
-                </Link>
-              )}
               <p className="text-label text-ink-soft mt-sm">{filteredUploads.length} shown · {uploads.length} total</p>
             </div>
             <Link to="/upload" className="bg-accent text-accent-contrast rounded-md px-lg py-sm text-body-sm font-medium">
@@ -116,20 +112,11 @@ export default function MyUploads() {
               )}
             </div>
           )}
+
         </section>
 
-        <aside className="hidden lg:block border-l border-line pl-2xl sticky top-xl">
-          <p className="text-label uppercase tracking-[0.08em] text-ink-soft mb-sm">Creator space</p>
-          <h2 className="font-display text-h2 mb-sm">Your uploads</h2>
-          <p className="text-body-sm text-ink-soft mb-xl">
-            New uploads appear here with their moderation status. Open a wallpaper to view its full details.
-          </p>
-          <div className="border-t border-line pt-lg space-y-sm text-body-sm">
-            <Link to="/account/settings" className="block text-ink hover:underline">Account settings →</Link>
-            <Link to="/account/favorites" className="block text-ink hover:underline">Saved wallpapers →</Link>
-            <Link to="/collections" className="block text-ink hover:underline">Collections →</Link>
-          </div>
-        </aside>
+        <AccountSidebar username={profile?.username} variant="wallpapers" />
+
       </div>
     </div>
   )
@@ -162,9 +149,10 @@ function PhoneUploadCard({ wallpaper }) {
       className="group self-start bg-surface border border-line rounded-md overflow-hidden block"
     >
       <div className="relative aspect-[9/16]">
-        <img
+        <OptimizedImage
           src={wallpaper.imageUrl}
           alt={wallpaper.title}
+          width={520}
           className="w-full h-full object-cover block transition-transform duration-200 group-hover:scale-[1.02]"
         />
         <UploadStatus status={wallpaper.status} />
@@ -181,9 +169,10 @@ function DesktopUploadCard({ wallpaper }) {
       className="group self-start bg-surface border border-line rounded-md overflow-hidden block"
     >
       <div className="relative aspect-[16/9]">
-        <img
+        <OptimizedImage
           src={wallpaper.imageUrl}
           alt={wallpaper.title}
+          width={520}
           className="w-full h-full object-cover block transition-transform duration-200 group-hover:scale-[1.02]"
         />
         <UploadStatus status={wallpaper.status} />

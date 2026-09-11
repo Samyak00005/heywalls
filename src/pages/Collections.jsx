@@ -2,11 +2,12 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Plus, Trash2 } from 'lucide-react'
 import { LoadingState } from '../components/common/DataState.jsx'
+import AccountSidebar from '../components/common/AccountSidebar.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import { supabase } from '../lib/supabaseClient.js'
 
 export default function Collections() {
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
   const [collections, setCollections] = useState([])
   const [loading, setLoading] = useState(true)
   const [name, setName] = useState('')
@@ -90,6 +91,8 @@ export default function Collections() {
 
   return (
     <div className="container-page pt-xl pb-3xl md:pb-4xl">
+      <div className="grid lg:grid-cols-[minmax(0,1fr)_300px] gap-2xl lg:gap-4xl items-start">
+        <section className="min-w-0">
       <div className="flex items-end justify-between gap-lg mb-xl">
         <div>
           <h1 className="font-display text-h1 mb-sm">Collections</h1>
@@ -165,6 +168,9 @@ export default function Collections() {
           })}
         </div>
       )}
+        </section>
+        <AccountSidebar username={profile?.username} variant="collections" />
+      </div>
     </div>
   )
 }

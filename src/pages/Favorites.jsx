@@ -33,19 +33,20 @@ export default function Favorites() {
   if (wallpapers === null) {
     return (
       <div className="container-page pt-xl pb-3xl">
-        <LoadingState label="Loading favorites…" />
+        <LoadingState label="Loading favourites…" />
       </div>
     )
   }
 
   return (
     <div className="container-page pt-xl pb-3xl md:pb-4xl">
+      <section className="min-w-0">
       <div className="flex flex-wrap items-end justify-between gap-lg mb-xl">
         <div>
-          <h1 className="font-display text-h1">Favorites</h1>
-          <p className="text-body-sm text-ink-soft mt-sm">Your saved wallpapers.</p>
+          <h1 className="font-display text-h1">Favourites</h1>
+          <p className="text-body-sm text-ink-soft mt-sm">Your favourite wallpapers.</p>
         </div>
-        {wallpapers.length > 0 && <span className="text-label text-ink-soft">{filteredWallpapers.length} shown · {wallpapers.length} saved</span>}
+        {wallpapers.length > 0 && <span className="text-label text-ink-soft">{filteredWallpapers.length} shown · {wallpapers.length} favourites</span>}
       </div>
 
       {wallpapers.length > 0 && (
@@ -53,11 +54,12 @@ export default function Favorites() {
       )}
       {filteredWallpapers.length === 0 ? (
         <p className="text-body-sm text-ink-soft py-xl">
-          {wallpapers.length === 0 ? 'Nothing saved yet — tap the heart on any wallpaper to save it here.' : 'No favorites match these filters.'}
+          {wallpapers.length === 0 ? 'Nothing here yet — tap the heart on any wallpaper to add it to your favourites.' : 'No favourites match these filters.'}
         </p>
       ) : (
         <WallpaperGrid wallpapers={filteredWallpapers} />
       )}
+      </section>
     </div>
   )
 }

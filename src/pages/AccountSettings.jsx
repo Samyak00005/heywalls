@@ -68,16 +68,9 @@ export default function AccountSettings() {
       <section className="min-w-0">
           <div className="flex flex-wrap items-end justify-between gap-lg mb-xl max-w-[900px]">
             <div>
-              <p className="text-label uppercase tracking-[0.08em] text-ink-soft mb-xs">Account</p>
+              <p className="text-label uppercase tracking-[0.08em] text-ink-soft mb-xs">My account</p>
               <h1 className="font-display text-h1">Edit profile</h1>
             </div>
-            <button
-              type="button"
-              onClick={() => navigate(profile?.username ? `/profile/${profile.username}` : '/')}
-              className="border border-ink text-ink rounded-md px-lg py-sm text-body-sm hover:bg-ink hover:text-bg"
-            >
-              Cancel
-            </button>
           </div>
 
           <form onSubmit={handleSave} className="flex flex-col gap-md max-w-[900px]">
@@ -128,13 +121,22 @@ export default function AccountSettings() {
 
             {error && <p className="text-body-sm text-accent-2">{error}</p>}
 
-            <button
-              type="submit"
-              disabled={saving}
-              className="bg-accent text-accent-contrast rounded-md px-lg py-sm text-body font-medium disabled:opacity-60 self-start"
-            >
-              {saving ? 'Saving…' : 'Save changes'}
-            </button>
+            <div className="flex flex-wrap items-center gap-md pt-xs">
+              <button
+                type="submit"
+                disabled={saving}
+                className="bg-accent text-accent-contrast rounded-md px-lg py-sm text-body font-medium disabled:opacity-60"
+              >
+                {saving ? 'Saving…' : 'Save changes'}
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate(profile?.username ? `/profile/${profile.username}` : '/')}
+                className="border border-ink text-ink rounded-md px-lg py-sm text-body-sm hover:bg-ink hover:text-bg"
+              >
+                Cancel
+              </button>
+            </div>
           </form>
       </section>
     </div>

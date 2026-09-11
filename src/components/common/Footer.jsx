@@ -29,7 +29,7 @@ export default function Footer() {
             <p className="text-label uppercase tracking-[0.08em] text-ink-soft mb-md">Your space</p>
             <nav className="flex flex-col gap-sm text-body-sm">
               <Link to="/upload" className="hover:text-ink">Upload a wallpaper</Link>
-              <Link to="/account/uploads" className="hover:text-ink">My uploads</Link>
+              <Link to="/account/uploads" className="hover:text-ink">My wallpapers</Link>
               <Link to="/collections" className="hover:text-ink">Collections</Link>
             </nav>
           </div>

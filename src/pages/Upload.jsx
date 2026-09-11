@@ -211,7 +211,7 @@ export default function Upload() {
             </div>
           </div>
           <div className="border-t border-line mt-xl pt-lg">
-            <Link to="/account/uploads" className="text-body-sm text-ink underline">View my uploads →</Link>
+            <Link to="/account/uploads" className="text-body-sm text-ink underline">View my wallpapers →</Link>
           </div>
         </aside>
       </div>

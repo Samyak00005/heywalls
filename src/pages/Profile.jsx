@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useLocation, useParams } from 'react-router-dom'
 import { LoadingState } from '../components/common/DataState.jsx'
 import AccountSidebar from '../components/common/AccountSidebar.jsx'
 import WallpaperCard from '../components/wallpaper/WallpaperCard.jsx'
@@ -12,6 +12,7 @@ const PROFILE_UPLOAD_LIMIT = 5
 
 export default function Profile() {
   const { username } = useParams()
+  const location = useLocation()
   const { profile, loading, error } = useProfile(username)
   const { user, profile: currentProfile, signOut } = useAuth()
   const [uploads, setUploads] = useState([])
@@ -97,6 +98,12 @@ export default function Profile() {
     setDeleteConfirmation('')
     setAccountError(null)
   }
+
+  useEffect(() => {
+    if (isOwnProfile && location.hash === '#delete-account') {
+      openDeleteAccount()
+    }
+  }, [isOwnProfile, location.hash])
 
   async function handleDeleteAccount(e) {
     e.preventDefault()
@@ -254,7 +261,7 @@ export default function Profile() {
         </section>
 
         {isOwnProfile ? (
-          <AccountSidebar onDeleteAccount={openDeleteAccount} username={profile.username} />
+          <AccountSidebar onDeleteAccount={openDeleteAccount} username={profile.username} showAdminDashboard={currentProfile?.role === 'admin'} variant="profile" />
         ) : (
           <aside className="hidden lg:block border-l border-line pl-2xl sticky top-xl">
             <p className="text-label uppercase tracking-[0.08em] text-ink-soft mb-sm">Creator</p>
@@ -291,7 +298,7 @@ export default function Profile() {
             </div>
 
             <p className="text-body-sm text-ink-soft mt-lg">
-              This permanently deletes your HeyWalls account, profile, uploads, saved wallpapers, and collections. This cannot be undone.
+              This permanently deletes your HeyWalls account, profile, uploads, favourite wallpapers, and collections. This cannot be undone.
             </p>
 
             <form onSubmit={handleDeleteAccount} className="flex flex-col gap-lg mt-xl">

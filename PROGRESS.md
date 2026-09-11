@@ -293,3 +293,9 @@ Edge Function deployed before everything works live
 - Tightened edit-profile form spacing.
 - Added password + DELETE confirmation modal for account deletion with Cancel.
 - Password is verified before invoking the account-deletion Edge Function.
+
+## Phase 17 — Image & Performance Optimization
+- Optimized public wallpaper images with Supabase transformations and safe fallback.
+- Added native lazy loading/async decoding and first-viewport priority hints.
+- Added short-lived wallpaper metadata cache with background refresh.
+- Preserved full-resolution detail/download images and existing visual design.

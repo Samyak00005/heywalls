@@ -26,8 +26,8 @@ export default function WallpaperGrid({ wallpapers, columns = 'auto' }) {
 
   return (
     <div className={`columns-2 sm:columns-3 ${columnClass} gap-sm sm:gap-md lg:gap-lg`}>
-      {wallpapers.map((w) => (
-        <WallpaperCard key={w.id} wallpaper={w} />
+      {wallpapers.map((w, index) => (
+        <WallpaperCard key={w.id} wallpaper={w} priority={index < 4} />
       ))}
     </div>
   )

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { ErrorState, LoadingState } from '../components/common/DataState.jsx'
 import { Camera, Film, Layers3, Leaf, Minus, Orbit, Palette, Sparkles } from 'lucide-react'
 import WallpaperGrid from '../components/wallpaper/WallpaperGrid.jsx'
+import OptimizedImage from '../components/wallpaper/OptimizedImage.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useCategories } from '../hooks/useCategories.js'
 import { useWallpapers } from '../hooks/useWallpapers.js'
@@ -70,7 +71,7 @@ function pickHero(wallpapers, count = 6) {
 
 export default function Home() {
   const { user } = useAuth()
-  const { wallpapers, loading, error } = useWallpapers()
+  const { wallpapers, loading, error, totalCount } = useWallpapers()
   const { categories } = useCategories()
 
   // "Hung gallery" strip and the community section both pull from the same
@@ -106,7 +107,7 @@ export default function Home() {
 
           <div className="hidden lg:grid grid-cols-3 border-y border-line py-lg gap-lg">
             <div>
-              <p className="font-display text-h2">{wallpapers.length || '—'}</p>
+              <p className="font-display text-h2">{totalCount ?? '—'}</p>
               <p className="text-label text-ink-soft mt-xs">walls to explore</p>
             </div>
             <div>
@@ -154,9 +155,13 @@ export default function Home() {
                         style={{ transform: `rotate(${rotations[groupIndex * 3] || '0deg'})` }}
                       >
                         <div className="aspect-[9/16]">
-                          <img
+                          <OptimizedImage
                             src={group[0].imageUrl}
                             alt={group[0].title}
+                            width={520}
+                            quality={84}
+                            loading="eager"
+                            fetchPriority="high"
                             className="rounded-sm block w-full h-full object-cover"
                           />
                         </div>
@@ -179,9 +184,13 @@ export default function Home() {
                           }}
                         >
                           <div className="aspect-[16/9]">
-                            <img
+                            <OptimizedImage
                               src={w.imageUrl}
                               alt={w.title}
+                              width={760}
+                              quality={84}
+                              loading={groupIndex === 0 ? 'eager' : 'lazy'}
+                              fetchPriority={groupIndex === 0 ? 'high' : 'auto'}
                               className="rounded-sm block w-full h-full object-cover"
                             />
                           </div>

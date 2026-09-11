@@ -6,8 +6,6 @@ import {
   Compass,
   Heart,
   Image,
-  FolderHeart,
-  ShieldCheck,
   UserCircle,
   LogOut,
 } from "lucide-react";
@@ -21,8 +19,6 @@ export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
-
-  const isAdmin = profile?.role === "admin";
 
   async function handleSignOut() {
     setMenuOpen(false);
@@ -50,31 +46,17 @@ export default function Navbar() {
       ? [
           {
             to: "/account/favorites",
-            label: "Saved",
+            label: "Favourites",
             icon: Heart,
           },
           {
             to: "/account/uploads",
-            label: "My uploads",
+            label: "My wallpapers",
             icon: Image,
-          },
-          {
-            to: "/collections",
-            label: "Collections",
-            icon: FolderHeart,
           },
         ]
       : []),
 
-    ...(isAdmin
-      ? [
-          {
-            to: "/admin",
-            label: "Admin Dashboard",
-            icon: ShieldCheck,
-          },
-        ]
-      : []),
   ];
 
   return (
@@ -275,7 +257,7 @@ export default function Navbar() {
               >
                 <UserCircle size={18} strokeWidth={1.8} className="shrink-0" />
 
-                <span>Account settings</span>
+                <span>My account</span>
               </Link>
             )}
 

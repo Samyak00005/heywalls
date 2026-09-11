@@ -32,7 +32,7 @@ export default function FavoriteButton({ wallpaperId, variant = 'icon' }) {
         }
       >
         <Heart size={16} fill={active ? 'currentColor' : 'none'} />
-        {active ? 'Saved' : 'Save'}
+        {active ? 'Favourited' : 'Favourite'}
       </button>
     )
   }

@@ -439,6 +439,7 @@ button:disabled {
   display: block;
   min-width: 0;
   padding-left: 40px;
+  background: color-mix(in srgb, var(--color-surface) 72%, var(--color-bg) 28%);
 }
 
 .library-search-input::placeholder {
