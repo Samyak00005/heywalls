@@ -115,11 +115,86 @@ cover.
   project. Run the migration + seed SQL, add your keys to `.env`, then
   check `/`, `/explore`, `/category/:slug`, and `/wallpaper/:id`
 
-**Status:** builds clean; needs your Supabase project connected to verify live
+**Status:** confirmed working — local dev, GitHub, and Vercel production
+deployment all pulling real data from Supabase
+
+**Deployment notes (for future phases)**
+- My zip export had a bug: the exclude pattern meant to skip the `.git`
+  folder (`*.git*`) also matched and stripped `.gitignore` itself. Every
+  zip up through this point shipped without it — recreated manually.
+  Fixed for any future exports.
+- Local `.env` and Vercel's environment variables are two separate places
+  — adding keys to one does nothing for the other. Both need
+  `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` set independently.
+- Vercel doesn't apply new/changed environment variables to an existing
+  deployment — it needs an explicit **Redeploy** after saving them.
+- The Supabase "Project URL" is `https://<ref>.supabase.co` — easy to
+  mistake for the dashboard link (`supabase.com/dashboard/project/<ref>`),
+  which looks similar but isn't the API endpoint.
 
 ---
 
 ## Phase 3 — Auth & user accounts (not started)
+## Phase 3 — Auth & user accounts ✅
+
+**Added**
+- `supabase/migrations/0002_auth_profile_trigger.sql` — a Postgres trigger
+  that auto-creates a `profiles` row the moment someone signs up (handles
+  username collisions by appending a number), plus an update policy so
+  users can edit their own profile
+- `src/context/AuthContext.jsx` — wraps Supabase Auth: session, profile,
+  sign up/in/out, password reset/update
+- `src/components/auth/AuthForm.jsx` — shared login/signup form
+- `src/components/auth/ProtectedRoute.jsx` — redirects guests to `/login`
+- **New pages:** `Login`, `Signup`, `ForgotPassword`, `UpdatePassword`
+  (the reset-email landing page), `Profile` (`/profile/:username`,
+  public), `AccountSettings` (`/account/settings`, protected)
+- `Navbar` now shows Sign in/Sign out based on real auth state
+- `src/hooks/useProfile.js` — fetch a public profile by username
+
+**Design decisions**
+- Chose a DB trigger over a client-side insert for creating `profiles`
+  rows — it's atomic with the signup itself, doesn't depend on the
+  browser tab staying open, and will work the same way later if OAuth
+  providers get added
+- Signup handles both Supabase project configurations (email confirmation
+  on or off) rather than assuming one
+
+**Status:** builds clean, lints clean (0 errors); needs your Supabase
+project to run the new migration before auth will work live
+
+**Follow-up fixes (after live testing)**
+- **Username not appearing / not saving:** root cause was almost
+  certainly the signup trigger not creating a `profiles` row (or an
+  `.update()` call succeeding silently even when it changed zero rows —
+  a Supabase gotcha). Fixed two ways: (1) `AccountSettings` now uses
+  `.select().single()` on save, which turns a silent no-op into a real,
+  visible error instead of a false "Saved."; (2) added a **self-healing
+  `ensureProfile`** in `AuthContext` — if a signed-in user has no profile
+  row, one is created on the spot, so the app recovers regardless of
+  whether the trigger fired.
+- `supabase/migrations/0003_profile_insert_policy.sql` — the self-heal
+  insert needs its own RLS policy (only SELECT and UPDATE existed before)
+- Auth pages (Login/Signup/Forgot/Update Password) now use a centered
+  `AuthLayout` instead of the left-aligned page layout
+- Added `PasswordInput` — show/hide toggle, used on every password field
+  sitewide for consistency
+- Signup now has a confirm-password field with a mismatch check
+- Signup detects an already-registered email (Supabase returns a
+  "successful" signup with an empty `identities` array in this case, to
+  avoid leaking which emails exist) and redirects to Login with the email
+  prefilled
+- Widened `--container-max` from 1200px to 1400px so the homepage hero
+  gallery fits 5 wallpapers without scrolling
+- Home's hero gallery now picks a curated 5-wallpaper mix (3 phone + 2
+  desktop when available) instead of an arbitrary slice
+- Added the site logo (provided by Samyak) to the Navbar, resized from
+  542KB to 16KB for page-load reasons. Flagged for the record: the logo's
+  multi-color gradient sits outside the site's one-accent-color system —
+  intentional per Samyak's direction, not an oversight
+
+---
+
 ## Phase 4 — Upload & favorites (not started)
 ## Phase 5 — Admin & moderation (not started)
 ## Phase 6 — Polish & launch (not started)

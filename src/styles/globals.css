@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=Work+Sans:wght@400;500;600&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=Work+Sans:wght@400;500;600&display=swap');
 @import "tailwindcss";
 
 /*
@@ -10,18 +10,18 @@
 
 @theme {
   /* Color */
-  --color-bg: #eeeae2;
-  --color-surface: #e4dfd2;
-  --color-ink: #201e1b;
-  --color-ink-soft: #6b6459;
-  --color-line: #c9c2b4;
-  --color-accent: #3e5641;
-  --color-accent-2: #a6553c;
-  --color-accent-contrast: #f4f1e9;
+  --color-bg: #EEEAE2;
+  --color-surface: #E4DFD2;
+  --color-ink: #201E1B;
+  --color-ink-soft: #6B6459;
+  --color-line: #C9C2B4;
+  --color-accent: #3E5641;
+  --color-accent-2: #A6553C;
+  --color-accent-contrast: #F4F1E9;
 
   /* Type */
-  --font-display: "Fraunces", serif;
-  --font-ui: "Work Sans", sans-serif;
+  --font-display: 'Fraunces', serif;
+  --font-ui: 'Work Sans', sans-serif;
 
   --text-display: 38px;
   --text-display--line-height: 1.05;
@@ -41,11 +41,11 @@
   /* Spacing (8px grid). Named to avoid colliding with Tailwind's own
      numeric spacing scale (p-4, gap-8, etc. are Tailwind's defaults and
      do NOT match our scale past the 16px step) — always use these. */
-  --spacing-xs: 4px; /* space-1 */
-  --spacing-sm: 8px; /* space-2 */
-  --spacing-md: 12px; /* space-3 */
-  --spacing-lg: 16px; /* space-4 — card padding, always */
-  --spacing-xl: 24px; /* space-5 */
+  --spacing-xs: 4px;   /* space-1 */
+  --spacing-sm: 8px;   /* space-2 */
+  --spacing-md: 12px;  /* space-3 */
+  --spacing-lg: 16px;  /* space-4 — card padding, always */
+  --spacing-xl: 24px;  /* space-5 */
   --spacing-2xl: 32px; /* space-6 */
   --spacing-3xl: 48px; /* space-7 — section gap mobile, gutter desktop */
   --spacing-4xl: 64px; /* space-8 — section gap desktop */
@@ -57,7 +57,7 @@
   --radius-lg: 4px;
 
   /* Layout */
-  --container-max: 1200px;
+  --container-max: 1400px;
   --breakpoint-desktop: 720px;
 }
 
@@ -75,10 +75,7 @@ body {
   line-height: var(--text-body--line-height);
 }
 
-h1,
-h2,
-h3,
-.font-display {
+h1, h2, h3, .font-display {
   font-family: var(--font-display);
 }
 

@@ -1,5 +1,5 @@
-import { Link } from "react-router-dom";
-import DownloadButton from "./DownloadButton.jsx";
+import { Link } from 'react-router-dom'
+import DownloadButton from './DownloadButton.jsx'
 
 /**
  * Fixed ratios by orientation — this is what makes the masonry grid in
@@ -8,9 +8,9 @@ import DownloadButton from "./DownloadButton.jsx";
  * where the actual phone/desktop variants get chosen.
  */
 export default function WallpaperCard({ wallpaper }) {
-  const { id, title, imageUrl, orientation, category, uploader } = wallpaper;
-  const aspect = orientation === "phone" ? "aspect-[9/16]" : "aspect-video";
-  const filename = `heywalls-${title.toLowerCase().replace(/\s+/g, "-")}.jpg`;
+  const { id, title, imageUrl, orientation, category, uploader } = wallpaper
+  const aspect = orientation === 'phone' ? 'aspect-[9/16]' : 'aspect-video'
+  const filename = `heywalls-${title.toLowerCase().replace(/\s+/g, '-')}.jpg`
 
   return (
     <div className="break-inside-avoid mb-md md:mb-lg border border-line rounded-md overflow-hidden bg-surface">
@@ -23,10 +23,7 @@ export default function WallpaperCard({ wallpaper }) {
         <DownloadButton imageUrl={imageUrl} filename={filename} />
       </Link>
       <div className="p-lg flex items-center justify-between">
-        <Link
-          to={`/wallpaper/${id}`}
-          className="text-body-sm text-ink truncate"
-        >
+        <Link to={`/wallpaper/${id}`} className="text-body-sm text-ink truncate">
           {title}
         </Link>
         <span className="text-label text-ink-soft shrink-0 ml-sm">
@@ -34,5 +31,5 @@ export default function WallpaperCard({ wallpaper }) {
         </span>
       </div>
     </div>
-  );
+  )
 }

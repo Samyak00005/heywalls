@@ -40,6 +40,13 @@ npm run dev
 1. Create a free project at [supabase.com](https://supabase.com)
 2. Copy the project URL + anon key into `.env`
 3. In the Supabase SQL Editor, run `supabase/migrations/0001_init.sql`,
-   then `supabase/seed.sql` — this creates the tables and adds sample
-   curated wallpapers so the site isn't empty
-4. Restart `npm run dev` — Home and Explore should now show real data
+   then `0002_auth_profile_trigger.sql`, then
+   `0003_profile_insert_policy.sql`, then `supabase/seed.sql` — this
+   creates the tables, the auto-profile trigger and its insert policy,
+   and sample curated wallpapers so the site isn't empty
+4. In Supabase Authentication settings, confirm whether "Confirm email" is
+   on or off — either works with this app, but it changes what happens
+   right after someone signs up (email confirmation step vs. immediate
+   sign-in)
+5. Restart `npm run dev` — Home and Explore should now show real data,
+   and you should be able to sign up / sign in from the navbar

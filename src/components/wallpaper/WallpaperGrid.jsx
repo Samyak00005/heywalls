@@ -1,4 +1,4 @@
-import WallpaperCard from "./WallpaperCard.jsx";
+import WallpaperCard from './WallpaperCard.jsx'
 
 /**
  * CSS-columns masonry ("river" layout) instead of a row-based grid. This
@@ -11,7 +11,7 @@ export default function WallpaperGrid({ wallpapers }) {
       <p className="text-body-sm text-ink-soft py-2xl text-center">
         No wallpapers match those filters yet.
       </p>
-    );
+    )
   }
 
   return (
@@ -20,5 +20,5 @@ export default function WallpaperGrid({ wallpapers }) {
         <WallpaperCard key={w.id} wallpaper={w} />
       ))}
     </div>
-  );
+  )
 }

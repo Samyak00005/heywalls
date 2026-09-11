@@ -1,0 +1,105 @@
+import { createContext, useContext, useEffect, useState } from 'react'
+import { supabase } from '../lib/supabaseClient.js'
+
+const AuthContext = createContext(undefined)
+
+/**
+ * Fetches the signed-in user's profile row. If none exists (the
+ * on-signup DB trigger didn't fire, or fired before this table existed),
+ * creates one on the spot instead of leaving the app permanently showing
+ * no username. Handles a rare username collision with one retry.
+ */
+async function ensureProfile(user) {
+  const { data } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .single()
+  if (data) return data
+
+  const base = user.email ? user.email.split('@')[0] : 'user'
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const username = attempt === 0 ? base : `${base}${Math.floor(Math.random() * 1000)}`
+    const { data: created, error } = await supabase
+      .from('profiles')
+      .insert({ id: user.id, username })
+      .select()
+      .single()
+    if (created) return created
+    if (error?.code !== '23505') {
+      // Not a unique-constraint conflict — no point retrying.
+      console.error('Failed to create profile:', error)
+      return null
+    }
+  }
+  return null
+}
+
+export function AuthProvider({ children }) {
+  const [session, setSession] = useState(null)
+  const [profile, setProfile] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session)
+      setLoading(false)
+    })
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      setSession(newSession)
+    })
+
+    return () => listener.subscription.unsubscribe()
+  }, [])
+
+  useEffect(() => {
+    if (!session?.user) {
+      setProfile(null)
+      return
+    }
+    let active = true
+    ensureProfile(session.user).then((p) => {
+      if (active) setProfile(p)
+    })
+    return () => {
+      active = false
+    }
+  }, [session])
+
+  async function refreshProfile() {
+    if (!session?.user) return
+    const p = await ensureProfile(session.user)
+    setProfile(p)
+  }
+
+  const value = {
+    session,
+    user: session?.user ?? null,
+    profile,
+    loading,
+    signUp: (email, password, username) =>
+      supabase.auth.signUp({
+        email,
+        password,
+        options: username ? { data: { username } } : undefined,
+      }),
+    signIn: (email, password) =>
+      supabase.auth.signInWithPassword({ email, password }),
+    signOut: () => supabase.auth.signOut(),
+    resetPassword: (email) =>
+      supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/update-password`,
+      }),
+    updatePassword: (password) => supabase.auth.updateUser({ password }),
+    refreshProfile,
+  }
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+}
+
+export function useAuth() {
+  const ctx = useContext(AuthContext)
+  if (!ctx) throw new Error('useAuth must be used within an AuthProvider')
+  return ctx
+}

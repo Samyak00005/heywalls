@@ -1,10 +1,10 @@
-import SwatchTag from "./SwatchTag.jsx";
+import SwatchTag from './SwatchTag.jsx'
 
 const orientations = [
-  { value: null, label: "All" },
-  { value: "desktop", label: "Desktop" },
-  { value: "phone", label: "Phone" },
-];
+  { value: null, label: 'All' },
+  { value: 'desktop', label: 'Desktop' },
+  { value: 'phone', label: 'Phone' },
+]
 
 export default function FilterBar({
   categories,
@@ -37,10 +37,10 @@ export default function FilterBar({
             key={o.label}
             onClick={() => onOrientationChange(o.value)}
             className={
-              "px-lg py-sm rounded-md border " +
+              'px-lg py-sm rounded-md border ' +
               (activeOrientation === o.value
-                ? "border-ink text-ink"
-                : "border-line text-ink-soft")
+                ? 'border-ink text-ink'
+                : 'border-line text-ink-soft')
             }
           >
             {o.label}
@@ -48,5 +48,5 @@ export default function FilterBar({
         ))}
       </div>
     </div>
-  );
+  )
 }
