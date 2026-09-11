@@ -5,7 +5,7 @@ import WallpaperCard from './WallpaperCard.jsx'
  * is what lets a 16:9 desktop card and a 9:16 phone card sit side by side
  * without one stretching to match the other's height.
  */
-export default function WallpaperGrid({ wallpapers }) {
+export default function WallpaperGrid({ wallpapers, columns = 'auto' }) {
   if (!wallpapers.length) {
     return (
       <p className="text-body-sm text-ink-soft py-2xl text-center">
@@ -14,8 +14,18 @@ export default function WallpaperGrid({ wallpapers }) {
     )
   }
 
+  const allPhone = wallpapers.length > 0 && wallpapers.every((w) => w.orientation === 'phone')
+  const columnClass =
+    columns === 4
+      ? 'lg:columns-4'
+      : columns === 5
+        ? 'lg:columns-5'
+        : allPhone
+          ? 'lg:columns-5'
+          : 'lg:columns-4'
+
   return (
-    <div className="columns-2 md:columns-4 gap-md md:gap-lg">
+    <div className={`columns-2 sm:columns-3 ${columnClass} gap-sm sm:gap-md lg:gap-lg`}>
       {wallpapers.map((w) => (
         <WallpaperCard key={w.id} wallpaper={w} />
       ))}

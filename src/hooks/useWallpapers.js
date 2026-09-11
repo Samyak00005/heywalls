@@ -11,17 +11,22 @@ export function useWallpapers() {
     let active = true
 
     async function load() {
-      const { data, error } = await supabase
+      setLoading(true)
+      setError(null)
+
+      const { data, error: queryError } = await supabase
         .from('wallpapers')
         .select(WALLPAPER_SELECT)
         .eq('status', 'approved')
         .order('created_at', { ascending: false })
 
       if (!active) return
-      if (error) {
-        setError(error)
+
+      if (queryError) {
+        setError(queryError)
+        setWallpapers([])
       } else {
-        setWallpapers(data.map(mapWallpaperRow))
+        setWallpapers((data || []).map(mapWallpaperRow))
       }
       setLoading(false)
     }

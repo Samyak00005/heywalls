@@ -106,3 +106,247 @@ h1, h2, h3, .font-display {
   --color-ink-soft: #A39C8C;
   --color-line: #423F35;
 }
+
+
+
+/* V5 responsive polish */
+@media (max-width: 719px) {
+  .container-page {
+    padding-inline: 16px;
+  }
+}
+
+/* Keep admin horizontal navigation usable on narrow screens. */
+.admin-theme nav::-webkit-scrollbar {
+  height: 3px;
+}
+.admin-theme nav::-webkit-scrollbar-thumb {
+  background: var(--color-line);
+}
+
+/* Wallpaper detail images never force horizontal overflow. */
+.wallpaper-detail-frame {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+/* Admin shell: one clean header, no duplicate public-site header. */
+.admin-header-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--spacing-2xl);
+}
+
+.admin-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.admin-brand-subtitle {
+  display: block;
+  margin-top: 3px;
+  font-family: var(--font-ui);
+  font-size: 10px;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: .16em;
+  color: var(--color-ink-soft);
+}
+
+.admin-nav {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.admin-nav-item {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  color: var(--color-ink-soft);
+  font-size: var(--text-body-sm);
+  line-height: 1.4;
+  transition: background-color .15s ease, color .15s ease, border-color .15s ease;
+}
+
+.admin-nav-item:hover {
+  color: var(--color-ink);
+  background: var(--color-surface);
+}
+
+.admin-nav-item.is-active {
+  color: var(--color-ink);
+  background: var(--color-surface);
+  border-color: var(--color-ink);
+}
+
+@media (max-width: 719px) {
+  .admin-header-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--spacing-sm);
+  }
+
+  .admin-nav {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+    margin-inline: calc(var(--spacing-sm) * -1);
+    padding-inline: var(--spacing-sm);
+  }
+
+  .admin-back span {
+    display: none;
+  }
+
+  .admin-nav-item {
+    padding: var(--spacing-sm);
+  }
+}
+
+/* Compact upload cards: title first, then orientation/category on one line. */
+.upload-card-meta {
+  padding: var(--spacing-md) var(--spacing-lg);
+}
+
+.upload-card-title {
+  display: block;
+  font-size: var(--text-body-sm);
+  line-height: 1.35;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.upload-card-subline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-xs);
+  color: var(--color-ink-soft);
+  font-size: var(--text-label);
+  line-height: 1.4;
+}
+
+.upload-card-subline span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: right;
+}
+
+@media (max-width: 719px) {
+  .upload-card-meta {
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+}
+
+/* Admin dashboard stat cards: two compact columns on phones. */
+.admin-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--spacing-md);
+}
+
+.admin-stat-card {
+  min-width: 0;
+  padding: var(--spacing-md);
+}
+
+.admin-stat-value {
+  margin-top: var(--spacing-xs);
+  font-family: var(--font-display);
+  font-size: 24px;
+  line-height: 1.05;
+}
+
+@media (min-width: 720px) {
+  .admin-stats-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--spacing-lg);
+  }
+  .admin-stat-card {
+    padding: var(--spacing-lg);
+  }
+  .admin-stat-value {
+    font-size: var(--text-h1);
+  }
+}
+
+/* Admin wallpaper library: fixed thumbnail column + aligned info + actions. */
+.admin-wallpaper-row {
+  display: grid;
+  grid-template-columns: 160px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-lg);
+}
+
+.admin-wallpaper-thumb {
+  width: 160px;
+  height: 92px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+}
+
+.admin-wallpaper-thumb.is-phone {
+  width: 72px;
+  height: 104px;
+}
+
+.admin-wallpaper-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.admin-wallpaper-info {
+  min-width: 0;
+}
+
+.admin-wallpaper-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--spacing-sm);
+  white-space: nowrap;
+}
+
+@media (max-width: 719px) {
+  .admin-wallpaper-row {
+    grid-template-columns: 72px minmax(0, 1fr);
+    align-items: start;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+  }
+
+  .admin-wallpaper-thumb {
+    width: 72px;
+    height: 52px;
+  }
+
+  .admin-wallpaper-thumb.is-phone {
+    width: 52px;
+    height: 76px;
+  }
+
+  .admin-wallpaper-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+}

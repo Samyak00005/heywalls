@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import SwatchTag from '../components/wallpaper/SwatchTag.jsx'
 import UploadDropzone from '../components/upload/UploadDropzone.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
@@ -41,6 +41,18 @@ export default function Upload() {
       const ext = file.name.split('.').pop()
       const path = `${user.id}/${Date.now()}.${ext}`
 
+      const dimensions = await new Promise((resolve) => {
+        const image = new Image()
+        const objectUrl = URL.createObjectURL(file)
+        const finish = (value) => {
+          URL.revokeObjectURL(objectUrl)
+          resolve(value)
+        }
+        image.onload = () => finish({ width: image.naturalWidth, height: image.naturalHeight })
+        image.onerror = () => finish({ width: null, height: null })
+        image.src = objectUrl
+      })
+
       const { error: uploadError } = await supabase.storage
         .from('wallpapers')
         .upload(path, file)
@@ -61,6 +73,8 @@ export default function Upload() {
           image_url: publicUrl,
           thumbnail_url: publicUrl,
           orientation,
+          width: dimensions.width,
+          height: dimensions.height,
           status,
         })
         .select()
@@ -86,9 +100,15 @@ export default function Upload() {
 
   return (
     <div className="container-page pt-xl pb-3xl md:pb-4xl">
-      <h1 className="font-display text-h1 mb-lg">Upload a wallpaper</h1>
+      <div className="grid lg:grid-cols-[minmax(0,760px)_minmax(260px,1fr)] gap-2xl lg:gap-4xl items-start">
+        <section>
+          <div className="mb-xl">
+            <p className="text-label uppercase tracking-[0.08em] text-ink-soft mb-sm">Creator space</p>
+            <h1 className="font-display text-h1 mb-sm">Upload a wallpaper</h1>
+            <p className="text-body-sm text-ink-soft">Share a 9:16 phone or 16:9 desktop wallpaper with the HeyWalls community.</p>
+          </div>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-lg max-w-[520px]">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-lg">
         <UploadDropzone
           file={file}
           error={fileError}
@@ -168,6 +188,30 @@ export default function Upload() {
           </p>
         )}
       </form>
+        </section>
+
+        <aside className="hidden lg:block border-l border-line pl-2xl sticky top-xl">
+          <p className="text-label uppercase tracking-[0.08em] text-ink-soft mb-sm">Before you upload</p>
+          <h2 className="font-display text-h2 mb-lg">Keep the original ratio</h2>
+          <div className="space-y-lg text-body-sm text-ink-soft">
+            <div>
+              <p className="text-ink mb-xs">Desktop</p>
+              <p>Use a 16:9 image such as 1920 × 1080 or 2560 × 1440.</p>
+            </div>
+            <div>
+              <p className="text-ink mb-xs">Phone</p>
+              <p>Use a 9:16 image such as 1080 × 1920 or 1440 × 2560.</p>
+            </div>
+            <div>
+              <p className="text-ink mb-xs">Tip</p>
+              <p>The uploaded file's real width and height are stored automatically and shown on its detail page.</p>
+            </div>
+          </div>
+          <div className="border-t border-line mt-xl pt-lg">
+            <Link to="/account/uploads" className="text-body-sm text-ink underline">View my uploads →</Link>
+          </div>
+        </aside>
+      </div>
     </div>
   )
 }

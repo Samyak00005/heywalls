@@ -4,6 +4,8 @@ import ProtectedRoute from '../components/auth/ProtectedRoute.jsx'
 import AdminLayout from '../components/admin/AdminLayout.jsx'
 import AccountSettings from '../pages/AccountSettings.jsx'
 import Category from '../pages/Category.jsx'
+import Collections from '../pages/Collections.jsx'
+import CollectionDetail from '../pages/CollectionDetail.jsx'
 import Explore from '../pages/Explore.jsx'
 import Favorites from '../pages/Favorites.jsx'
 import ForgotPassword from '../pages/ForgotPassword.jsx'
@@ -19,6 +21,7 @@ import AdminCategories from '../pages/admin/Categories.jsx'
 import AdminDashboard from '../pages/admin/Dashboard.jsx'
 import AdminModeration from '../pages/admin/Moderation.jsx'
 import AdminUsers from '../pages/admin/Users.jsx'
+import AdminWallpapers from '../pages/admin/Wallpapers.jsx'
 
 export default function AppRoutes() {
   return (
@@ -27,6 +30,23 @@ export default function AppRoutes() {
       <Route path="/explore" element={<Explore />} />
       <Route path="/category/:slug" element={<Category />} />
       <Route path="/wallpaper/:id" element={<WallpaperDetail />} />
+
+      <Route
+        path="/collections"
+        element={
+          <ProtectedRoute>
+            <Collections />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/collections/:id"
+        element={
+          <ProtectedRoute>
+            <CollectionDetail />
+          </ProtectedRoute>
+        }
+      />
 
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
@@ -73,6 +93,16 @@ export default function AppRoutes() {
           <AdminRoute>
             <AdminLayout>
               <AdminDashboard />
+            </AdminLayout>
+          </AdminRoute>
+        }
+      />
+      <Route
+        path="/admin/wallpapers"
+        element={
+          <AdminRoute>
+            <AdminLayout>
+              <AdminWallpapers />
             </AdminLayout>
           </AdminRoute>
         }

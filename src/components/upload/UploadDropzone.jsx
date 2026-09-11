@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 const MAX_SIZE_MB = 15
 const ACCEPTED_TYPES = ['image/jpeg', 'image/png']
@@ -6,6 +6,18 @@ const ACCEPTED_TYPES = ['image/jpeg', 'image/png']
 export default function UploadDropzone({ file, onFileSelect, error }) {
   const inputRef = useRef(null)
   const [dragging, setDragging] = useState(false)
+  const [previewUrl, setPreviewUrl] = useState(null)
+
+  useEffect(() => {
+    if (!file) {
+      setPreviewUrl(null)
+      return undefined
+    }
+
+    const url = URL.createObjectURL(file)
+    setPreviewUrl(url)
+    return () => URL.revokeObjectURL(url)
+  }, [file])
 
   function validateAndSet(selected) {
     if (!selected) return
@@ -32,7 +44,10 @@ export default function UploadDropzone({ file, onFileSelect, error }) {
         setDragging(false)
         validateAndSet(e.dataTransfer.files?.[0])
       }}
-      onClick={() => inputRef.current?.click()}
+      onClick={(e) => {
+        if (e.target === inputRef.current) return
+        inputRef.current?.click()
+      }}
       className={
         'border border-dashed rounded-lg p-2xl text-center cursor-pointer transition-colors ' +
         (dragging ? 'border-ink bg-surface' : 'border-ink-soft')
@@ -43,12 +58,15 @@ export default function UploadDropzone({ file, onFileSelect, error }) {
         type="file"
         accept="image/jpeg,image/png"
         className="hidden"
-        onChange={(e) => validateAndSet(e.target.files?.[0])}
+        onChange={(e) => {
+          validateAndSet(e.target.files?.[0])
+          e.target.value = ''
+        }}
       />
-      {file ? (
+      {file && previewUrl ? (
         <div>
           <img
-            src={URL.createObjectURL(file)}
+            src={previewUrl}
             alt="Selected wallpaper"
             className="max-h-[240px] mx-auto rounded-sm mb-md"
           />

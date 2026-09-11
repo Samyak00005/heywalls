@@ -33,7 +33,10 @@ npm run dev
 2. Import it in [Vercel](https://vercel.com) — it auto-detects Vite
 3. Add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` as environment
    variables in the Vercel project settings
-4. Deploy — you'll get a free `.vercel.app` URL
+4. Keep `vercel.json` in the project root. It rewrites SPA routes such as
+   `/admin/categories` to `index.html`, so direct navigation and browser
+   refreshes work correctly with React Router.
+5. Deploy — you'll get a free `.vercel.app` URL
 
 ## Supabase setup
 
@@ -42,9 +45,9 @@ npm run dev
 3. In the Supabase SQL Editor, run these in order:
    `0001_init.sql` → `0002_auth_profile_trigger.sql` →
    `0003_profile_insert_policy.sql` → `0004_own_wallpapers_visibility.sql` →
-   `0005_phase4_and_admin.sql` → `0006_storage.sql` → `seed.sql`
+   `0005_phase4_and_admin.sql` → `0006_storage.sql` → `0007_admin_profile_management.sql` → `seed.sql`
 4. Run `supabase/make_admin.sql` once to make your own account an admin
-   (it's hardcoded to username `samyak005` — edit if that's not you)
+   (edit the email list in that file if needed)
 5. Deploy the delete-account Edge Function (needed for the "Delete
    account" button in settings):
    ```
@@ -52,6 +55,21 @@ npm run dev
    npx supabase link --project-ref <your-project-ref>
    npx supabase functions deploy delete-account
    ```
-   No manual secrets needed — Supabase injects the URL/keys automatically.
+   No manual secrets are needed — Supabase injects the URL/keys automatically.
 6. Restart `npm run dev` — Home and Explore should now show real data,
-   auth should work, and once you're an admin, `/admin` should load
+   auth should work, and once you're an admin, `/admin` should load.
+
+
+## New UI / collections features
+
+Run `supabase/migrations/0008_collections.sql` after the existing migrations to enable private user collections.
+
+The wallpaper detail page now shows:
+- exact 9:16 phone or 16:9 desktop presentation
+- uploaded image resolution when stored
+- related wallpapers
+- Share
+- Favorites / Saved
+- Add to Collection
+
+Users can access **Saved** and **Collections** from the navigation when signed in. Collections can be created from the Collections page or directly while viewing a wallpaper.

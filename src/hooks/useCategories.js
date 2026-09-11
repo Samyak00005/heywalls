@@ -10,16 +10,21 @@ export function useCategories() {
     let active = true
 
     async function load() {
+      setLoading(true)
+      setError(null)
+
       const { data, error } = await supabase
         .from('categories')
         .select('id, name, slug, hex_color')
         .order('name', { ascending: true })
 
       if (!active) return
+
       if (error) {
         setError(error)
+        setCategories([])
       } else {
-        setCategories(data)
+        setCategories(data || [])
       }
       setLoading(false)
     }
@@ -30,5 +35,5 @@ export function useCategories() {
     }
   }, [])
 
-  return { categories, loading, error }
+  return { categories, setCategories, loading, error }
 }

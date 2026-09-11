@@ -39,6 +39,7 @@ export function AuthProvider({ children }) {
   const [session, setSession] = useState(null)
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [profileLoading, setProfileLoading] = useState(false)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -56,11 +57,16 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     if (!session?.user) {
       setProfile(null)
+      setProfileLoading(false)
       return
     }
+
     let active = true
+    setProfileLoading(true)
     ensureProfile(session.user).then((p) => {
-      if (active) setProfile(p)
+      if (!active) return
+      setProfile(p)
+      setProfileLoading(false)
     })
     return () => {
       active = false
@@ -69,8 +75,10 @@ export function AuthProvider({ children }) {
 
   async function refreshProfile() {
     if (!session?.user) return
+    setProfileLoading(true)
     const p = await ensureProfile(session.user)
     setProfile(p)
+    setProfileLoading(false)
   }
 
   const value = {
@@ -78,6 +86,7 @@ export function AuthProvider({ children }) {
     user: session?.user ?? null,
     profile,
     loading,
+    profileLoading,
     signUp: (email, password, username) =>
       supabase.auth.signUp({
         email,

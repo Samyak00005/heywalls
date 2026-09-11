@@ -7,22 +7,34 @@ import { useAuth } from '../context/AuthContext.jsx'
 import { useCategories } from '../hooks/useCategories.js'
 import { useWallpapers } from '../hooks/useWallpapers.js'
 
-const rotations = ['-2deg', '1.5deg', '-1deg', '2deg', '-1.5deg']
+const rotations = ['-2deg', '1.5deg', '-1deg', '2deg', '-1.5deg', '1deg']
 
 /**
- * Curates a 5-wallpaper hero mix — 3 phone + 2 desktop, interleaved, when
- * there's enough of each. Falls back to 5 of one orientation, then to
- * whatever's available, rather than an arbitrary unbalanced slice.
+ * Curates a repeating hero rhythm: one 9:16 phone wallpaper beside two
+ * 16:9 desktop wallpapers stacked vertically. The group repeats when there
+ * are enough images and gracefully falls back when the catalog is smaller.
  */
-function pickHero(wallpapers, count = 5) {
+function pickHero(wallpapers, count = 6) {
   const phones = wallpapers.filter((w) => w.orientation === 'phone')
   const desktops = wallpapers.filter((w) => w.orientation === 'desktop')
 
-  if (phones.length >= 3 && desktops.length >= 2) {
-    return [phones[0], desktops[0], phones[1], desktops[1], phones[2]]
-  }
-  if (phones.length >= count) return phones.slice(0, count)
-  if (desktops.length >= count) return desktops.slice(0, count)
+  // The desktop hero repeats this composition:
+  //   [ vertical | horizontal ]
+  //   [ vertical | horizontal ]
+  // followed by another group when enough wallpapers exist.
+  // This keeps the visual rhythm balanced while preserving each image's
+  // intended orientation.
+  const preferred = [
+    phones[0],
+    desktops[0],
+    desktops[1],
+    phones[1],
+    desktops[2],
+    desktops[3],
+  ].filter(Boolean)
+
+  if (preferred.length >= 3) return preferred.slice(0, count)
+
   return wallpapers.slice(0, count)
 }
 
@@ -34,29 +46,48 @@ export default function Home() {
   // "Hung gallery" strip and the community section both pull from the same
   // live dataset for now — Phase 4 will split this by uploader_id once
   // real user uploads exist alongside curated content.
-  const hung = useMemo(() => pickHero(wallpapers, 5), [wallpapers])
+  const hung = useMemo(() => pickHero(wallpapers, 6), [wallpapers])
   const spotlight = useMemo(() => {
     const hungIds = new Set(hung.map((w) => w.id))
-    return wallpapers.filter((w) => !hungIds.has(w.id)).slice(0, 5)
+    return wallpapers.filter((w) => !hungIds.has(w.id)).slice(0, 20)
   }, [wallpapers, hung])
 
   return (
     <div>
       <section className="container-page pt-lg md:pt-2xl pb-xl md:pb-3xl">
-        <h1 className="font-display italic text-display max-w-[480px] mb-lg">
-          Walls worth living with.
-        </h1>
-        <p className="text-body text-ink-soft max-w-[340px] mb-xl">
-          Wallpapers curated by us, uploaded by everyone else. Pick a mood,
-          grab it for your phone or your desktop, done.
-        </p>
-        <div className="flex gap-sm">
-          <Link
-            to="/explore"
-            className="bg-accent text-accent-contrast rounded-md px-lg py-sm text-body font-medium"
-          >
-            Explore wallpapers
-          </Link>
+        <div className="grid lg:grid-cols-[minmax(0,1fr)_minmax(360px,0.9fr)] gap-2xl lg:gap-4xl items-end">
+          <div>
+            <h1 className="font-display italic text-display max-w-[620px] mb-lg">
+              Walls worth living with.
+            </h1>
+            <p className="text-body text-ink-soft max-w-[420px] mb-xl">
+              Wallpapers curated by us, uploaded by everyone else. Pick a mood,
+              grab it for your phone or your desktop, done.
+            </p>
+            <div className="flex gap-sm">
+              <Link
+                to="/explore"
+                className="bg-accent text-accent-contrast rounded-md px-lg py-sm text-body font-medium"
+              >
+                Explore wallpapers
+              </Link>
+            </div>
+          </div>
+
+          <div className="hidden lg:grid grid-cols-3 border-y border-line py-lg gap-lg">
+            <div>
+              <p className="font-display text-h2">{wallpapers.length || '—'}</p>
+              <p className="text-label text-ink-soft mt-xs">walls to explore</p>
+            </div>
+            <div>
+              <p className="font-display text-h2">{categories.length || '—'}</p>
+              <p className="text-label text-ink-soft mt-xs">moods & categories</p>
+            </div>
+            <div>
+              <p className="font-display text-h2">9:16 / 16:9</p>
+              <p className="text-label text-ink-soft mt-xs">phone + desktop</p>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -74,26 +105,66 @@ export default function Home() {
 
       {!error && !loading && (
         <>
-          <div className="flex items-start gap-md md:gap-lg overflow-x-auto container-page pb-3xl">
-            {hung.map((w, i) => (
-              <Link
-                key={w.id}
-                to={`/wallpaper/${w.id}`}
-                className="shrink-0 bg-surface p-sm pb-xl rounded-sm shadow-hung block"
-                style={{ transform: `rotate(${rotations[i]})` }}
-              >
-                <img
-                  src={w.imageUrl}
-                  alt={w.title}
-                  width={w.orientation === 'phone' ? 140 : 220}
-                  height={w.orientation === 'phone' ? 249 : 124}
-                  className="rounded-sm block"
-                />
-                <p className="text-label text-ink-soft text-center mt-sm">
-                  {w.category}
-                </p>
-              </Link>
-            ))}
+          <div className="container-page pb-3xl">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-md md:gap-lg w-full">
+              {Array.from({ length: Math.ceil(hung.length / 3) }, (_, groupIndex) => {
+                const group = hung.slice(groupIndex * 3, groupIndex * 3 + 3)
+
+                if (!group.length) return null
+
+                return (
+                  <div
+                    key={`hero-group-${groupIndex}`}
+                    className="flex items-start gap-md md:gap-lg min-w-0"
+                  >
+                    {group[0] && (
+                      <Link
+                        to={`/wallpaper/${group[0].id}`}
+                        className="bg-surface p-sm rounded-sm shadow-hung block min-w-0 w-[38.7%]"
+                        style={{ transform: `rotate(${rotations[groupIndex * 3] || '0deg'})` }}
+                      >
+                        <div className="aspect-[9/16]">
+                          <img
+                            src={group[0].imageUrl}
+                            alt={group[0].title}
+                            className="rounded-sm block w-full h-full object-cover"
+                          />
+                        </div>
+                        <p className="text-label text-ink-soft text-center mt-sm truncate">
+                          {group[0].category}
+                        </p>
+                      </Link>
+                    )}
+
+                    <div className="flex flex-col gap-md md:gap-lg min-w-0 flex-1">
+                      {group.slice(1, 3).map((w, index) => (
+                        <Link
+                          key={w.id}
+                          to={`/wallpaper/${w.id}`}
+                          className="bg-surface p-sm rounded-sm shadow-hung block min-w-0"
+                          style={{
+                            transform: `rotate(${
+                              rotations[groupIndex * 3 + index + 1] || '0deg'
+                            })`,
+                          }}
+                        >
+                          <div className="aspect-[16/9]">
+                            <img
+                              src={w.imageUrl}
+                              alt={w.title}
+                              className="rounded-sm block w-full h-full object-cover"
+                            />
+                          </div>
+                          <p className="text-label text-ink-soft text-center mt-sm truncate">
+                            {w.category}
+                          </p>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
           </div>
 
           <section className="container-page pb-3xl md:pb-4xl">
@@ -117,7 +188,7 @@ export default function Home() {
               <h2 className="font-display text-h2">Fresh on HeyWalls</h2>
               <span className="text-label text-ink-soft">updated daily</span>
             </div>
-            <WallpaperGrid wallpapers={spotlight} />
+            <WallpaperGrid wallpapers={spotlight} columns={4} />
           </section>
         </>
       )}
