@@ -1,14 +1,14 @@
-import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
-  Menu,
-  X,
   Compass,
   Heart,
   Image,
-  UserCircle,
   LogOut,
+  Menu,
+  UserCircle,
+  X,
 } from "lucide-react";
+import { useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.png";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useToast } from "./ToastContext.jsx";
@@ -56,7 +56,6 @@ export default function Navbar() {
           },
         ]
       : []),
-
   ];
 
   return (
@@ -102,7 +101,11 @@ export default function Navbar() {
           {/* Username */}
           {user && (
             <Link
-              to={profile?.username ? `/profile/${profile.username}` : "/account/settings"}
+              to={
+                profile?.username
+                  ? `/profile/${profile.username}`
+                  : "/account/settings"
+              }
               className="
                 hidden sm:inline
                 text-body-sm

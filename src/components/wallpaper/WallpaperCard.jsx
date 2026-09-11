@@ -1,10 +1,15 @@
 import { Link } from "react-router-dom";
 import DownloadButton from "./DownloadButton.jsx";
 import FavoriteButton from "./FavoriteButton.jsx";
-import ShareButton from "./ShareButton.jsx";
 import OptimizedImage from "./OptimizedImage.jsx";
+import ShareButton from "./ShareButton.jsx";
 
-export default function WallpaperCard({ wallpaper, showFavorite = true, showDownload = true, priority = false }) {
+export default function WallpaperCard({
+  wallpaper,
+  showFavorite = true,
+  showDownload = true,
+  priority = false,
+}) {
   const { id, title, imageUrl, orientation, category } = wallpaper;
   const aspect = orientation === "phone" ? "aspect-[9/16]" : "aspect-[16/9]";
   const filename = `heywalls-${title.toLowerCase().replace(/\s+/g, "-")}.jpg`;
@@ -15,10 +20,10 @@ export default function WallpaperCard({ wallpaper, showFavorite = true, showDown
         <OptimizedImage
           src={imageUrl}
           alt={title}
-          width={orientation === 'phone' ? 520 : 760}
+          width={orientation === "phone" ? 520 : 760}
           className="w-full h-full object-cover block"
-          loading={priority ? 'eager' : 'lazy'}
-          fetchPriority={priority ? 'high' : 'auto'}
+          loading={priority ? "eager" : "lazy"}
+          fetchPriority={priority ? "high" : "auto"}
         />
 
         <div className="wallpaper-card-actions absolute inset-0 pointer-events-none transition-opacity duration-150">

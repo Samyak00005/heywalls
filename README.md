@@ -59,12 +59,12 @@ npm run dev
 6. Restart `npm run dev` — Home and Explore should now show real data,
    auth should work, and once you're an admin, `/admin` should load.
 
-
 ## New UI / collections features
 
 Run `supabase/migrations/0008_collections.sql` after the existing migrations to enable private user collections.
 
 The wallpaper detail page now shows:
+
 - exact 9:16 phone or 16:9 desktop presentation
 - uploaded image resolution when stored
 - related wallpapers

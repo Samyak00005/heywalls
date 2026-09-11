@@ -1,14 +1,23 @@
-import { useMemo } from 'react'
-import { Link } from 'react-router-dom'
-import { ErrorState, LoadingState } from '../components/common/DataState.jsx'
-import { Camera, Film, Layers3, Leaf, Minus, Orbit, Palette, Sparkles } from 'lucide-react'
-import WallpaperGrid from '../components/wallpaper/WallpaperGrid.jsx'
-import OptimizedImage from '../components/wallpaper/OptimizedImage.jsx'
-import { useAuth } from '../context/AuthContext.jsx'
-import { useCategories } from '../hooks/useCategories.js'
-import { useWallpapers } from '../hooks/useWallpapers.js'
+import {
+  Camera,
+  Film,
+  Layers3,
+  Leaf,
+  Minus,
+  Orbit,
+  Palette,
+  Sparkles,
+} from "lucide-react";
+import { useMemo } from "react";
+import { Link } from "react-router-dom";
+import { ErrorState, LoadingState } from "../components/common/DataState.jsx";
+import OptimizedImage from "../components/wallpaper/OptimizedImage.jsx";
+import WallpaperGrid from "../components/wallpaper/WallpaperGrid.jsx";
+import { useAuth } from "../context/AuthContext.jsx";
+import { useCategories } from "../hooks/useCategories.js";
+import { useWallpapers } from "../hooks/useWallpapers.js";
 
-const rotations = ['-2deg', '1.5deg', '-1deg', '2deg', '-1.5deg', '1deg']
+const rotations = ["-2deg", "1.5deg", "-1deg", "2deg", "-1.5deg", "1deg"];
 
 const moodIcons = {
   abstract: Palette,
@@ -19,10 +28,10 @@ const moodIcons = {
   stock: Camera,
   superhero: Film,
   texture: Layers3,
-}
+};
 
 function MoodCard({ category }) {
-  const Icon = moodIcons[category.slug] || Palette
+  const Icon = moodIcons[category.slug] || Palette;
 
   return (
     <Link
@@ -33,11 +42,15 @@ function MoodCard({ category }) {
         <Icon size={17} strokeWidth={1.7} />
       </span>
       <span className="min-w-0">
-        <span className="block truncate text-body-sm text-ink">{category.name}</span>
-        <span className="mt-xs block text-label text-ink-soft">Explore mood</span>
+        <span className="block truncate text-body-sm text-ink">
+          {category.name}
+        </span>
+        <span className="mt-xs block text-label text-ink-soft">
+          Explore mood
+        </span>
       </span>
     </Link>
-  )
+  );
 }
 
 /**
@@ -46,8 +59,8 @@ function MoodCard({ category }) {
  * are enough images and gracefully falls back when the catalog is smaller.
  */
 function pickHero(wallpapers, count = 6) {
-  const phones = wallpapers.filter((w) => w.orientation === 'phone')
-  const desktops = wallpapers.filter((w) => w.orientation === 'desktop')
+  const phones = wallpapers.filter((w) => w.orientation === "phone");
+  const desktops = wallpapers.filter((w) => w.orientation === "desktop");
 
   // The desktop hero repeats this composition:
   //   [ vertical | horizontal ]
@@ -62,26 +75,26 @@ function pickHero(wallpapers, count = 6) {
     phones[1],
     desktops[2],
     desktops[3],
-  ].filter(Boolean)
+  ].filter(Boolean);
 
-  if (preferred.length >= 3) return preferred.slice(0, count)
+  if (preferred.length >= 3) return preferred.slice(0, count);
 
-  return wallpapers.slice(0, count)
+  return wallpapers.slice(0, count);
 }
 
 export default function Home() {
-  const { user } = useAuth()
-  const { wallpapers, loading, error, totalCount } = useWallpapers()
-  const { categories } = useCategories()
+  const { user } = useAuth();
+  const { wallpapers, loading, error, totalCount } = useWallpapers();
+  const { categories } = useCategories();
 
   // "Hung gallery" strip and the community section both pull from the same
   // live dataset for now — Phase 4 will split this by uploader_id once
   // real user uploads exist alongside curated content.
-  const hung = useMemo(() => pickHero(wallpapers, 6), [wallpapers])
+  const hung = useMemo(() => pickHero(wallpapers, 6), [wallpapers]);
   const spotlight = useMemo(() => {
-    const hungIds = new Set(hung.map((w) => w.id))
-    return wallpapers.filter((w) => !hungIds.has(w.id)).slice(0, 20)
-  }, [wallpapers, hung])
+    const hungIds = new Set(hung.map((w) => w.id));
+    return wallpapers.filter((w) => !hungIds.has(w.id)).slice(0, 20);
+  }, [wallpapers, hung]);
 
   return (
     <div>
@@ -107,12 +120,14 @@ export default function Home() {
 
           <div className="hidden lg:grid grid-cols-3 border-y border-line py-lg gap-lg">
             <div>
-              <p className="font-display text-h2">{totalCount ?? '—'}</p>
+              <p className="font-display text-h2">{totalCount ?? "—"}</p>
               <p className="text-label text-ink-soft mt-xs">walls to explore</p>
             </div>
             <div>
-              <p className="font-display text-h2">{categories.length || '—'}</p>
-              <p className="text-label text-ink-soft mt-xs">moods & categories</p>
+              <p className="font-display text-h2">{categories.length || "—"}</p>
+              <p className="text-label text-ink-soft mt-xs">
+                moods & categories
+              </p>
             </div>
             <div>
               <p className="font-display text-h2">9:16 / 16:9</p>
@@ -138,71 +153,78 @@ export default function Home() {
         <>
           <div className="container-page pb-3xl">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-md md:gap-lg w-full">
-              {Array.from({ length: Math.ceil(hung.length / 3) }, (_, groupIndex) => {
-                const group = hung.slice(groupIndex * 3, groupIndex * 3 + 3)
+              {Array.from(
+                { length: Math.ceil(hung.length / 3) },
+                (_, groupIndex) => {
+                  const group = hung.slice(groupIndex * 3, groupIndex * 3 + 3);
 
-                if (!group.length) return null
+                  if (!group.length) return null;
 
-                return (
-                  <div
-                    key={`hero-group-${groupIndex}`}
-                    className="flex items-start gap-md md:gap-lg min-w-0"
-                  >
-                    {group[0] && (
-                      <Link
-                        to={`/wallpaper/${group[0].id}`}
-                        className="bg-surface p-sm rounded-sm shadow-hung block min-w-0 w-[38.7%]"
-                        style={{ transform: `rotate(${rotations[groupIndex * 3] || '0deg'})` }}
-                      >
-                        <div className="aspect-[9/16]">
-                          <OptimizedImage
-                            src={group[0].imageUrl}
-                            alt={group[0].title}
-                            width={520}
-                            quality={84}
-                            loading="eager"
-                            fetchPriority="high"
-                            className="rounded-sm block w-full h-full object-cover"
-                          />
-                        </div>
-                        <p className="text-label text-ink-soft text-center mt-sm truncate">
-                          {group[0].category}
-                        </p>
-                      </Link>
-                    )}
-
-                    <div className="flex flex-col gap-md md:gap-lg min-w-0 flex-1">
-                      {group.slice(1, 3).map((w, index) => (
+                  return (
+                    <div
+                      key={`hero-group-${groupIndex}`}
+                      className="flex items-start gap-md md:gap-lg min-w-0"
+                    >
+                      {group[0] && (
                         <Link
-                          key={w.id}
-                          to={`/wallpaper/${w.id}`}
-                          className="bg-surface p-sm rounded-sm shadow-hung block min-w-0"
+                          to={`/wallpaper/${group[0].id}`}
+                          className="bg-surface p-sm rounded-sm shadow-hung block min-w-0 w-[38.7%]"
                           style={{
-                            transform: `rotate(${
-                              rotations[groupIndex * 3 + index + 1] || '0deg'
-                            })`,
+                            transform: `rotate(${rotations[groupIndex * 3] || "0deg"})`,
                           }}
                         >
-                          <div className="aspect-[16/9]">
+                          <div className="aspect-[9/16]">
                             <OptimizedImage
-                              src={w.imageUrl}
-                              alt={w.title}
-                              width={760}
+                              src={group[0].imageUrl}
+                              alt={group[0].title}
+                              width={520}
                               quality={84}
-                              loading={groupIndex === 0 ? 'eager' : 'lazy'}
-                              fetchPriority={groupIndex === 0 ? 'high' : 'auto'}
+                              loading="eager"
+                              fetchPriority="high"
                               className="rounded-sm block w-full h-full object-cover"
                             />
                           </div>
                           <p className="text-label text-ink-soft text-center mt-sm truncate">
-                            {w.category}
+                            {group[0].category}
                           </p>
                         </Link>
-                      ))}
+                      )}
+
+                      <div className="flex flex-col gap-md md:gap-lg min-w-0 flex-1">
+                        {group.slice(1, 3).map((w, index) => (
+                          <Link
+                            key={w.id}
+                            to={`/wallpaper/${w.id}`}
+                            className="bg-surface p-sm rounded-sm shadow-hung block min-w-0"
+                            style={{
+                              transform: `rotate(${
+                                rotations[groupIndex * 3 + index + 1] || "0deg"
+                              })`,
+                            }}
+                          >
+                            <div className="aspect-[16/9]">
+                              <OptimizedImage
+                                src={w.imageUrl}
+                                alt={w.title}
+                                width={760}
+                                quality={84}
+                                loading={groupIndex === 0 ? "eager" : "lazy"}
+                                fetchPriority={
+                                  groupIndex === 0 ? "high" : "auto"
+                                }
+                                className="rounded-sm block w-full h-full object-cover"
+                              />
+                            </div>
+                            <p className="text-label text-ink-soft text-center mt-sm truncate">
+                              {w.category}
+                            </p>
+                          </Link>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )
-              })}
+                  );
+                },
+              )}
             </div>
           </div>
 
@@ -236,11 +258,10 @@ export default function Home() {
             Got a wall worth sharing?
           </h3>
           <p className="text-body-sm text-ink-soft max-w-[380px] mb-lg">
-            Drop your desktop or phone wallpaper and let the community grab
-            it.
+            Drop your desktop or phone wallpaper and let the community grab it.
           </p>
           <Link
-            to={user ? '/upload' : '/login'}
+            to={user ? "/upload" : "/login"}
             className="bg-accent text-accent-contrast rounded-md px-lg py-sm text-body font-medium inline-block"
           >
             Upload a wallpaper
@@ -248,5 +269,5 @@ export default function Home() {
         </div>
       </section>
     </div>
-  )
+  );
 }
