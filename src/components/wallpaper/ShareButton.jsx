@@ -28,7 +28,9 @@ export default function ShareButton({ title, url, variant = 'primary' }) {
       ? 'bg-bg/90 hover:bg-bg text-ink rounded-sm p-sm shadow-hung transition-colors'
       : variant === 'ghost-icon'
         ? 'text-ink hover:text-ink-soft p-xs transition-colors'
-        : 'border border-ink text-ink rounded-md px-lg py-sm text-body font-medium inline-flex items-center gap-sm'
+        : variant === 'detail-icon'
+          ? 'border border-line text-ink rounded-sm p-sm inline-flex items-center justify-center hover:bg-surface'
+          : 'border border-ink text-ink rounded-md px-lg py-sm text-body font-medium inline-flex items-center gap-sm'
 
   return (
     <button
@@ -37,8 +39,8 @@ export default function ShareButton({ title, url, variant = 'primary' }) {
       aria-label="Share wallpaper"
       className={classes}
     >
-      <Share2 size={variant === 'ghost-icon' ? 22 : 17} strokeWidth={1.9} />
-      {variant !== 'icon' && variant !== 'ghost-icon' && (status || 'Share')}
+      <Share2 size={variant === 'ghost-icon' ? 22 : variant === 'detail-icon' ? 18 : 17} strokeWidth={1.9} />
+      {variant !== 'icon' && variant !== 'ghost-icon' && variant !== 'detail-icon' && (status || 'Share')}
     </button>
   )
 }

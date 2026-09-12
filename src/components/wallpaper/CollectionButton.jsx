@@ -109,7 +109,7 @@ export default function CollectionButton({ wallpaperId }) {
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
-        className="border border-ink text-ink rounded-md px-lg py-sm text-body font-medium inline-flex items-center gap-sm"
+        className="w-full border border-ink text-ink rounded-md px-lg py-sm text-body font-medium inline-flex items-center justify-center gap-sm"
       >
         <Plus size={16} />
         Collection

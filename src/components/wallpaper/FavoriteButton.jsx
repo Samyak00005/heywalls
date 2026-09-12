@@ -25,7 +25,7 @@ export default function FavoriteButton({ wallpaperId, variant = 'icon' }) {
         type="button"
         onClick={handleClick}
         className={
-          'rounded-md px-lg py-sm text-body font-medium inline-flex items-center gap-sm border ' +
+          'w-full rounded-md px-lg py-sm text-body font-medium inline-flex items-center justify-center gap-sm border ' +
           (active
             ? 'bg-accent-2 text-accent-contrast border-accent-2'
             : 'border-ink text-ink')

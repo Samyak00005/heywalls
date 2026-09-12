@@ -1,14 +1,40 @@
+import { Heart, Image as ImageIcon, Layers3 } from "lucide-react";
 import { useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ErrorState, LoadingState } from "../components/common/DataState.jsx";
+import CollectionButton from "../components/wallpaper/CollectionButton.jsx";
 import DownloadButton from "../components/wallpaper/DownloadButton.jsx";
 import FavoriteButton from "../components/wallpaper/FavoriteButton.jsx";
+import OptimizedImage from "../components/wallpaper/OptimizedImage.jsx";
 import ShareButton from "../components/wallpaper/ShareButton.jsx";
-import CollectionButton from "../components/wallpaper/CollectionButton.jsx";
 import WallpaperGrid from "../components/wallpaper/WallpaperGrid.jsx";
-import { getAspectRatioLabel, getOrientationLabel } from "../lib/orientation.js";
 import { useWallpaper } from "../hooks/useWallpaper.js";
 import { useWallpapers } from "../hooks/useWallpapers.js";
+import {
+  getAspectRatioLabel,
+  getOrientationLabel,
+  getOrientationWidth,
+} from "../lib/orientation.js";
+
+function MetaItem({ icon: Icon, label, value, first = false }) {
+  return (
+    <div
+      className={`flex min-h-[60px] items-center gap-lg border-line ${
+        first ? "" : "border-t"
+      }`}
+    >
+      <Icon size={16} strokeWidth={1.7} className="shrink-0 text-ink-soft" />
+
+      <div className="min-w-0 flex-1">
+        <p className="text-label text-ink-soft uppercase tracking-[0.08em]">
+          {label}
+        </p>
+
+        <p className="text-body-sm text-ink mt-xs">{value}</p>
+      </div>
+    </div>
+  );
+}
 
 export default function WallpaperDetail() {
   const { id } = useParams();
@@ -18,9 +44,14 @@ export default function WallpaperDetail() {
   const related = useMemo(() => {
     if (!wallpaper) return [];
 
-    return wallpapers
-      .filter((w) => w.id !== wallpaper.id && w.category === wallpaper.category)
-      .slice(0, 8);
+    const sameCategory = wallpapers.filter(
+      (w) => w.id !== wallpaper.id && w.category === wallpaper.category,
+    );
+    const fallback = wallpapers.filter(
+      (w) => w.id !== wallpaper.id && w.category !== wallpaper.category,
+    );
+
+    return [...sameCategory, ...fallback].slice(0, 8);
   }, [wallpapers, wallpaper]);
 
   if (loading) {
@@ -41,159 +72,143 @@ export default function WallpaperDetail() {
 
   const filename = `heywalls-${wallpaper.title
     .toLowerCase()
-    .replace(/\s+/g, "-")}.jpg`;
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")}.jpg`;
 
   const aspectLabel = getAspectRatioLabel(wallpaper.orientation);
   const orientationLabel = getOrientationLabel(wallpaper.orientation);
   const isPhone = wallpaper.orientation === "phone";
 
   return (
-    <div className="container-page pt-xl pb-3xl md:pb-4xl">
-      {/* Back */}
+    <div className="container-page pt-lg md:pt-xl pb-3xl md:pb-4xl">
       <Link
         to="/explore"
-        className="text-label text-ink-soft mb-lg inline-block"
+        className="text-label text-ink-soft mb-lg inline-flex items-center gap-xs"
       >
         ← All wallpapers
       </Link>
 
       <div className="grid lg:grid-cols-[minmax(0,1fr)_380px] gap-2xl lg:gap-4xl items-start">
-        {/* =====================================================
-            WALLPAPER PREVIEW
-        ====================================================== */}
+        {/* Preview */}
         <div className="min-w-0">
           <div
-            className="
-              relative
-              w-full
-              h-[68vh]
-              lg:h-[72vh]
-              min-h-[420px]
-              rounded-md
-              overflow-hidden
-              border
-              border-line
-              bg-surface
-              flex
-              items-center
-              justify-center
-              max-md:h-auto
-              max-md:min-h-0
-              max-md:rounded-none
-              max-md:border-0
-              max-md:bg-transparent
-              max-md:overflow-visible
-            "
+            className={`wallpaper-detail-frame relative w-full flex items-center justify-center border border-line bg-surface rounded-md overflow-hidden ${
+              isPhone ? "min-h-[520px] h-[72vh]" : "min-h-[360px] h-[68vh]"
+            } max-md:h-auto max-md:min-h-0 max-md:rounded-none max-md:border-0 max-md:bg-transparent max-md:overflow-visible`}
           >
-            <img
+            <OptimizedImage
               src={wallpaper.fullImageUrl}
               alt={wallpaper.title}
-              className={`
-                block
-                max-w-full
-                max-h-full
-                w-auto
-                h-auto
-                object-contain
-                ${
-                  isPhone
-                    ? "max-h-[66vh] lg:max-h-[70vh]"
-                    : "w-full h-full object-contain max-md:w-full max-md:h-auto max-md:max-h-none"
-                }
-              `}
+              width={getOrientationWidth(wallpaper.orientation)}
+              quality={92}
+              loading="eager"
+              fetchPriority="high"
+              className={
+                isPhone
+                  ? "block max-w-full max-h-[70vh] w-auto h-auto object-contain max-md:max-h-[78vh]"
+                  : "block w-full h-full object-contain max-md:w-full max-md:h-auto max-md:max-h-none"
+              }
             />
           </div>
         </div>
 
-        {/* =====================================================
-            WALLPAPER INFORMATION
-        ====================================================== */}
-        <div className="lg:sticky lg:top-xl">
-          {/* Title + mobile share */}
+        {/* Information */}
+        <aside className="lg:sticky lg:top-xl">
           <div className="flex items-start gap-md">
-            <h1 className="font-display text-h1 mb-sm flex-1">
-              {wallpaper.title}
-            </h1>
-
-            <div className="lg:hidden shrink-0 -mt-sm">
-              <ShareButton title={wallpaper.title} variant="ghost-icon" />
+            <h1 className="font-display text-h1 flex-1">{wallpaper.title}</h1>
+            <div className="shrink-0 -mt-xs">
+              <span className="md:hidden">
+                <ShareButton title={wallpaper.title} variant="ghost-icon" />
+              </span>
+              <span className="hidden md:inline-flex">
+                <ShareButton title={wallpaper.title} variant="detail-icon" />
+              </span>
             </div>
           </div>
 
-          {/* Description */}
           {wallpaper.description && (
-            <p className="text-body-sm text-ink-soft mb-lg">
+            <p className="text-body text-ink-soft mt-md mb-xl max-w-[520px]">
               {wallpaper.description}
             </p>
           )}
 
-          {/* Metadata */}
-          <div className="mb-xl">
-            <p className="text-body-sm text-ink mb-xs">
-              {orientationLabel} · {aspectLabel}
-            </p>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-1 gap-md my-lg">
+            <MetaItem
+              icon={ImageIcon}
+              label="Format"
+              value={`${orientationLabel} · ${aspectLabel}`}
+              first
+            />
+            <MetaItem
+              icon={Layers3}
+              label="Resolution"
+              value={wallpaper.resolution || "Not available"}
+            />
+            <MetaItem
+              icon={Heart}
+              label="Category"
+              value={wallpaper.category || "Uncategorized"}
+            />
+          </div>
 
+          <div className="border-t border-line pt-lg mb-xl">
             <p className="text-body-sm text-ink-soft">
-              Resolution: {wallpaper.resolution || "Not available"}
+              Published by:{" "}
+              {wallpaper.uploader ? (
+                <Link
+                  to={`/profile/${wallpaper.uploader}`}
+                  className="text-ink hover:underline underline-offset-4"
+                >
+                  @{wallpaper.uploader}
+                </Link>
+              ) : (
+                <span className="text-ink">HeyWalls</span>
+              )}
             </p>
           </div>
-
-          {/* Uploader */}
-          <div className="mb-xl">
-            {wallpaper.uploader ? (
-              <Link
-                to={`/profile/${wallpaper.uploader}`}
-                className="inline-flex flex-col text-label text-ink hover:underline"
-              >
-                <span>{wallpaper.uploaderDisplayName || `@${wallpaper.uploader}`}</span>
-                <span className="text-ink-soft mt-xs">@{wallpaper.uploader}</span>
-              </Link>
-            ) : (
-              <p className="text-label text-ink-soft">Curated by HeyWalls</p>
-            )}
+          <div className="flex flex-col gap-sm">
+            <div className="w-full">
+              <DownloadButton
+                imageUrl={wallpaper.fullImageUrl}
+                filename={filename}
+                wallpaperId={wallpaper.id}
+                variant="primary"
+              />
+            </div>
+            <div className="flex gap-sm w-full">
+              <div className="flex-1 min-w-0">
+                <FavoriteButton wallpaperId={wallpaper.id} variant="primary" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <CollectionButton wallpaperId={wallpaper.id} />
+              </div>
+            </div>
           </div>
-
-          {/* =====================================================
-              DESKTOP ACTIONS
-          ====================================================== */}
-          <div className="hidden lg:flex flex-wrap gap-sm">
-            <DownloadButton
-              imageUrl={wallpaper.fullImageUrl}
-              filename={filename}
-              wallpaperId={wallpaper.id}
-              variant="primary"
-            />
-
-            <FavoriteButton wallpaperId={wallpaper.id} variant="primary" />
-
-            <CollectionButton wallpaperId={wallpaper.id} />
-
-            <ShareButton title={wallpaper.title} variant="primary" />
-          </div>
-
-          {/* --- MOBILE ACTIONS --- */}
-          <div className="lg:hidden flex flex-wrap gap-sm">
-            <DownloadButton
-              imageUrl={wallpaper.fullImageUrl}
-              filename={filename}
-              wallpaperId={wallpaper.id}
-              variant="primary"
-            />
-
-            <FavoriteButton wallpaperId={wallpaper.id} variant="primary" />
-
-            <CollectionButton wallpaperId={wallpaper.id} />
-          </div>
-        </div>
+        </aside>
       </div>
 
-      {/* --- RELATED WALLPAPERS --- */}
       {related.length > 0 && (
-        <div className="mt-4xl">
-          <h2 className="font-display text-h2 mb-lg">Related wallpapers</h2>
-
+        <section className="mt-4xl">
+          <div className="flex items-baseline justify-between gap-lg mb-lg">
+            <div>
+              <p className="text-label text-ink-soft uppercase tracking-[0.08em] mb-xs">
+                More like this
+              </p>
+              <h2 className="font-display text-h2">Related wallpapers</h2>
+            </div>
+            <Link
+              to={
+                wallpaper.category
+                  ? `/explore?category=${encodeURIComponent(wallpaper.category)}`
+                  : "/explore"
+              }
+              className="text-label text-ink hover:underline underline-offset-4 shrink-0"
+            >
+              Explore more →
+            </Link>
+          </div>
           <WallpaperGrid wallpapers={related} />
-        </div>
+        </section>
       )}
     </div>
   );
