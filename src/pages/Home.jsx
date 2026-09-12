@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { ErrorState, LoadingState } from '../components/common/DataState.jsx'
-import { Camera, Film, Layers3, Leaf, Minus, Monitor, Orbit, Palette, Smartphone, Sparkles, Tablet } from 'lucide-react'
+import { Layers3, Leaf, Minus, Orbit, Palette, Sparkles } from 'lucide-react'
 import WallpaperGrid from '../components/wallpaper/WallpaperGrid.jsx'
 import OptimizedImage from '../components/wallpaper/OptimizedImage.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
@@ -11,9 +11,9 @@ import { useWallpapers } from '../hooks/useWallpapers.js'
 const rotations = ['-2deg', '1.5deg', '-1deg', '2deg', '-1.5deg', '1deg']
 
 const deviceLinks = [
-  { label: 'Desktop wallpapers', device: 'desktop', icon: Monitor },
-  { label: 'Mobile wallpapers', device: 'phone', icon: Smartphone },
-  { label: 'Tablet wallpapers', device: 'tablet', icon: Tablet },
+  { label: 'Desktop wallpapers', device: 'desktop' },
+  { label: 'Mobile wallpapers', device: 'phone' },
+  { label: 'Tablet wallpapers', device: 'tablet' },
 ]
 
 const moodIcons = {
@@ -22,8 +22,8 @@ const moodIcons = {
   minimal: Minus,
   nature: Leaf,
   space: Orbit,
-  stock: Camera,
-  superhero: Film,
+  stock: Palette,
+  superhero: Palette,
   texture: Layers3,
 }
 
@@ -109,20 +109,18 @@ export default function Home() {
                 Explore wallpapers
               </Link>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-sm mt-lg max-w-[720px]">
-              {deviceLinks.map(({ label, device, icon: Icon }) => (
+            <nav className="mt-lg flex flex-wrap items-center gap-x-lg gap-y-sm text-body-sm text-ink-soft" aria-label="Browse by device">
+              <span className="text-label uppercase tracking-[0.08em]">Browse by</span>
+              {deviceLinks.map(({ label, device }) => (
                 <Link
                   key={device}
                   to={`/explore?device=${device}`}
-                  className="group flex items-center gap-sm rounded-md border border-line bg-surface px-md py-sm text-body-sm text-ink transition-all duration-200 hover:-translate-y-0.5 hover:border-ink-soft"
+                  className="text-ink hover:underline underline-offset-4"
                 >
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm border border-line bg-bg text-ink-soft group-hover:text-ink">
-                    <Icon size={16} strokeWidth={1.8} />
-                  </span>
-                  <span>{label}</span>
+                  {label.replace(' wallpapers', '')}
                 </Link>
               ))}
-            </div>
+            </nav>
           </div>
 
           <div className="hidden lg:grid grid-cols-3 border-y border-line py-lg gap-lg">

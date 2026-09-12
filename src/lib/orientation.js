@@ -14,7 +14,7 @@ export function getAspectRatioLabel(orientation) {
 
 export function getOrientationAspectClass(orientation) {
   if (orientation === 'phone') return 'aspect-[9/16]'
-  if (orientation === 'tablet') return 'aspect-[4/3]'
+  if (orientation === 'tablet') return 'aspect-square'
   return 'aspect-[16/9]'
 }
 

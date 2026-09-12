@@ -58,7 +58,8 @@ export default function AccountSidebar({
   })
 
   return (
-    <aside className="hidden lg:block border-l border-line pl-2xl sticky top-xl">
+    <>
+      <aside className="hidden lg:block border-l border-line pl-2xl sticky top-xl">
       <p className="text-label uppercase tracking-[0.08em] text-ink-soft mb-sm">
         {config.eyebrow}
       </p>
@@ -103,6 +104,39 @@ export default function AccountSidebar({
           </div>
         )}
       </nav>
-    </aside>
+      </aside>
+
+      <section className="lg:hidden mt-3xl border-t border-line pt-xl" aria-label="Account navigation">
+        <p className="text-label uppercase tracking-[0.08em] text-ink-soft mb-sm">{config.eyebrow}</p>
+        <h2 className="font-display text-h3 mb-xs">{config.title}</h2>
+        <p className="text-body-sm text-ink-soft mb-lg max-w-[34rem]">{config.description}</p>
+        <nav className="border-y border-line">
+          {links.map((link) => (
+            <Link key={link.label} to={link.to} className="flex items-center justify-between py-md border-b border-line last:border-b-0 text-body-sm text-ink hover:underline">
+              <span>{link.label.replace(/ →$/, '')}</span>
+              <span aria-hidden="true">→</span>
+            </Link>
+          ))}
+          {showAdminDashboard && variant === 'profile' && (
+            <Link to="/admin" className="flex items-center justify-between py-md border-b border-line text-body-sm text-ink hover:underline">
+              <span>Admin Dashboard</span><span aria-hidden="true">→</span>
+            </Link>
+          )}
+          {config.deleteDivider && (
+            <div className="pt-md mt-sm border-t border-line">
+              {onDeleteAccount ? (
+                <button type="button" onClick={onDeleteAccount} className="flex w-full items-center justify-between py-md text-left text-body-sm text-accent-2 hover:underline">
+                  <span>Delete account</span><span aria-hidden="true">→</span>
+                </button>
+              ) : (
+                <Link to={`${profilePath}#delete-account`} className="flex items-center justify-between py-md text-body-sm text-accent-2 hover:underline">
+                  <span>Delete account</span><span aria-hidden="true">→</span>
+                </Link>
+              )}
+            </div>
+          )}
+        </nav>
+      </section>
+    </>
   )
 }
