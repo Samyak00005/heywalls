@@ -1,14 +1,14 @@
+import { useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
+  Menu,
+  X,
   Compass,
   Heart,
   Image,
-  LogOut,
-  Menu,
   UserCircle,
-  X,
+  LogOut,
 } from "lucide-react";
-import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.png";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useToast } from "./ToastContext.jsx";
@@ -56,6 +56,7 @@ export default function Navbar() {
           },
         ]
       : []),
+
   ];
 
   return (
@@ -101,11 +102,7 @@ export default function Navbar() {
           {/* Username */}
           {user && (
             <Link
-              to={
-                profile?.username
-                  ? `/profile/${profile.username}`
-                  : "/account/settings"
-              }
+              to={profile?.username ? `/profile/${profile.username}` : "/"}
               className="
                 hidden sm:inline
                 text-body-sm
@@ -241,7 +238,7 @@ export default function Navbar() {
             ========================== */}
             {user && (
               <Link
-                to="/account/settings"
+                to={profile?.username ? `/profile/${profile.username}` : "/"}
                 onClick={closeMenu}
                 className={`
                   flex items-center gap-md
@@ -252,7 +249,7 @@ export default function Navbar() {
                   hover:text-ink
                   hover:bg-surface
                   ${
-                    isActive("/account/settings")
+                    location.pathname.startsWith("/profile/")
                       ? "text-ink font-medium"
                       : "text-ink-soft"
                   }

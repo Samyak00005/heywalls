@@ -1,34 +1,28 @@
-import { Check, X } from "lucide-react";
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from 'react'
+import { Check, X } from 'lucide-react'
 
-const ToastContext = createContext(null);
+const ToastContext = createContext(null)
 
 export function ToastProvider({ children }) {
-  const [toast, setToast] = useState(null);
+  const [toast, setToast] = useState(null)
 
   const showToast = useCallback((message, options = {}) => {
-    const id = Date.now();
+    const id = Date.now()
     setToast({
       id,
       message,
-      type: options.type || "success",
+      type: options.type || 'success',
       duration: options.duration || 3200,
-    });
-  }, []);
+    })
+  }, [])
 
-  const dismissToast = useCallback(() => setToast(null), []);
+  const dismissToast = useCallback(() => setToast(null), [])
 
   useEffect(() => {
-    if (!toast) return undefined;
-    const timer = window.setTimeout(() => setToast(null), toast.duration);
-    return () => window.clearTimeout(timer);
-  }, [toast]);
+    if (!toast) return undefined
+    const timer = window.setTimeout(() => setToast(null), toast.duration)
+    return () => window.clearTimeout(timer)
+  }, [toast])
 
   return (
     <ToastContext.Provider value={{ showToast, dismissToast }}>
@@ -44,9 +38,7 @@ export function ToastProvider({ children }) {
             <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent text-accent-contrast">
               <Check size={15} strokeWidth={2} />
             </span>
-            <p className="min-w-0 flex-1 text-body-sm text-ink">
-              {toast.message}
-            </p>
+            <p className="min-w-0 flex-1 text-body-sm text-ink">{toast.message}</p>
             <button
               type="button"
               onClick={dismissToast}
@@ -59,11 +51,11 @@ export function ToastProvider({ children }) {
         </div>
       )}
     </ToastContext.Provider>
-  );
+  )
 }
 
 export function useToast() {
-  const context = useContext(ToastContext);
-  if (!context) throw new Error("useToast must be used within a ToastProvider");
-  return context;
+  const context = useContext(ToastContext)
+  if (!context) throw new Error('useToast must be used within a ToastProvider')
+  return context
 }

@@ -12,7 +12,6 @@ cover.
 ## Phase 0 — Project setup ✅
 
 **Added**
-
 - Vite + React project scaffolded
 - Tailwind v4 wired in via `@tailwindcss/vite`
 - `src/styles/globals.css` — design tokens (color, type, spacing) as CSS
@@ -30,7 +29,6 @@ cover.
 ## Phase 1 — Static pages & theme ✅
 
 **Added**
-
 - `Navbar`, `Footer`, `Layout` (common, persistent across all pages)
 - `SwatchTag`, `WallpaperCard`, `WallpaperGrid`, `FilterBar` (wallpaper
   components — reusable across Home/Explore/Category/Profile later)
@@ -42,7 +40,6 @@ cover.
   Phase 2 connects the real database
 
 **Fixed**
-
 - Renamed spacing tokens `--spacing-1..9` → `xs/sm/md/lg/xl/2xl/3xl/4xl/5xl`.
   The numeric names collided with Tailwind's own default spacing scale
   (`p-8` ≠ our 64px) — would've caused silent inconsistency later
@@ -52,7 +49,6 @@ cover.
 **Status:** builds clean, lints clean, visually confirmed against the theme
 
 **Refinements (after live testing on Vercel)**
-
 - Fixed a layout bug: mixing 16:9 desktop and 9:16 phone cards in a regular
   CSS grid stretched each row to the tallest item, leaving a large empty
   gap under shorter cards
@@ -70,7 +66,6 @@ cover.
 ## Phase 2 — Database & real data ⏳ next
 
 **Will add**
-
 - Supabase migrations for `profiles`, `wallpapers`, `categories`,
   `wallpaper_categories`
 - Seed data (curated wallpapers + categories)
@@ -88,7 +83,6 @@ cover.
 ## Phase 2 — Database & real data ✅
 
 **Added**
-
 - `supabase/migrations/0001_init.sql` — creates `profiles`, `categories`,
   `wallpapers`, `wallpaper_categories`, with RLS enabled and public-read
   policies (write policies land in Phase 4/5 alongside auth + roles)
@@ -107,7 +101,6 @@ cover.
   the detail page) instead of overriding its styles from outside
 
 **Changed**
-
 - Home's "From the community" section renamed to "Fresh on HeyWalls" —
   it's pulling from the same curated dataset as everything else right now
   (no real uploader accounts exist yet), so the old label overstated it
@@ -116,7 +109,6 @@ cover.
   this is simpler than server-side filtering for now)
 
 **Known items**
-
 - One lint warning in `useWallpaper.js` (`setState` inside effect) — an
   intentional reset-on-id-change pattern, not a bug
 - This phase can't be tested from my side — it depends on your Supabase
@@ -127,7 +119,6 @@ cover.
 deployment all pulling real data from Supabase
 
 **Deployment notes (for future phases)**
-
 - My zip export had a bug: the exclude pattern meant to skip the `.git`
   folder (`*.git*`) also matched and stripped `.gitignore` itself. Every
   zip up through this point shipped without it — recreated manually.
@@ -144,11 +135,9 @@ deployment all pulling real data from Supabase
 ---
 
 ## Phase 3 — Auth & user accounts (not started)
-
 ## Phase 3 — Auth & user accounts ✅
 
 **Added**
-
 - `supabase/migrations/0002_auth_profile_trigger.sql` — a Postgres trigger
   that auto-creates a `profiles` row the moment someone signs up (handles
   username collisions by appending a number), plus an update policy so
@@ -164,7 +153,6 @@ deployment all pulling real data from Supabase
 - `src/hooks/useProfile.js` — fetch a public profile by username
 
 **Design decisions**
-
 - Chose a DB trigger over a client-side insert for creating `profiles`
   rows — it's atomic with the signup itself, doesn't depend on the
   browser tab staying open, and will work the same way later if OAuth
@@ -176,7 +164,6 @@ deployment all pulling real data from Supabase
 project to run the new migration before auth will work live
 
 **Follow-up fixes (after live testing)**
-
 - **Username not appearing / not saving:** root cause was almost
   certainly the signup trigger not creating a `profiles` row (or an
   `.update()` call succeeding silently even when it changed zero rows —
@@ -216,7 +203,6 @@ pile up with no way to act on them. Built a working slice of Phase 5
 alongside Phase 4 rather than leave that gap.
 
 **Admin**
-
 - `ADMIN_ONLY_LOGIN` flag in `src/lib/featureFlags.js` — while true, only
   `profiles.role = 'admin'` accounts can sign in (signup still works,
   for creating test accounts). Flip to `false` in Phase 6 for real launch.
@@ -233,7 +219,6 @@ alongside Phase 4 rather than leave that gap.
 - `AdminRoute` guard, `AdminLayout` wrapper
 
 **Upload**
-
 - `/upload` — title, description, orientation, category picker, drag-drop
   image (`UploadDropzone`, client-validated: JPG/PNG, 15MB max)
 - Uploads go to Supabase Storage (`wallpapers` bucket), row inserted as
@@ -242,18 +227,15 @@ alongside Phase 4 rather than leave that gap.
   new "view own wallpapers regardless of status" RLS policy
 
 **Favorites**
-
 - `useFavorites` hook, `FavoriteButton` on every card and the detail page
 - `/account/favorites` — saved wallpapers
 
 **Downloads**
-
 - `DownloadButton` now logs to the `downloads` table and increments
   `download_count` via an `increment_download_count` RPC — works for
   guests too (nullable `user_id`)
 
 **Account Settings follow-up (from feedback)**
-
 - Now centered (missed this earlier — only auth pages got `AuthLayout`)
 - Added: change password (in-app, no email round-trip needed since
   already authenticated), delete account, quick links to uploads/favorites
@@ -263,7 +245,6 @@ alongside Phase 4 rather than leave that gap.
   server-side. Needs a manual `supabase functions deploy` — see README.
 
 **Other fixes from feedback**
-
 - Home's "Fresh on HeyWalls" now shows 5 wallpapers, not 4
 - Upload CTAs on Home now actually link somewhere (`/upload` if signed
   in, `/login` if not) instead of being static buttons
@@ -303,7 +284,6 @@ Edge Function deployed before everything works live
 ---
 
 ## Phase 5 — Admin & moderation (core pulled into Phase 4 — see above)
-
 ## Phase 6 — Polish & launch (not started)
 
 ## Phase 16.1 — Account edit/delete flow
@@ -315,7 +295,6 @@ Edge Function deployed before everything works live
 - Password is verified before invoking the account-deletion Edge Function.
 
 ## Phase 17 — Image & Performance Optimization
-
 - Optimized public wallpaper images with Supabase transformations and safe fallback.
 - Added native lazy loading/async decoding and first-viewport priority hints.
 - Added short-lived wallpaper metadata cache with background refresh.

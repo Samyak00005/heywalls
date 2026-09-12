@@ -1,20 +1,20 @@
-import { useState } from "react";
-import { getOptimizedImageUrl } from "../../lib/imageOptimization.js";
+import { useState } from 'react'
+import { getOptimizedImageUrl } from '../../lib/imageOptimization.js'
 
 export default function OptimizedImage({
   src,
   alt,
-  className = "",
+  className = '',
   width,
   quality = 78,
-  loading = "lazy",
-  fetchPriority = "auto",
+  loading = 'lazy',
+  fetchPriority = 'auto',
   ...props
 }) {
   const [currentSrc, setCurrentSrc] = useState(
-    getOptimizedImageUrl(src, { width, quality }),
-  );
-  const [failed, setFailed] = useState(false);
+    getOptimizedImageUrl(src, { width, quality })
+  )
+  const [failed, setFailed] = useState(false)
 
   return (
     <img
@@ -26,11 +26,11 @@ export default function OptimizedImage({
       className={className}
       onError={() => {
         if (!failed && currentSrc !== src) {
-          setFailed(true);
-          setCurrentSrc(src);
+          setFailed(true)
+          setCurrentSrc(src)
         }
       }}
       {...props}
     />
-  );
+  )
 }

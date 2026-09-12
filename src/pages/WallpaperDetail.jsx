@@ -1,11 +1,12 @@
 import { useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ErrorState, LoadingState } from "../components/common/DataState.jsx";
-import CollectionButton from "../components/wallpaper/CollectionButton.jsx";
 import DownloadButton from "../components/wallpaper/DownloadButton.jsx";
 import FavoriteButton from "../components/wallpaper/FavoriteButton.jsx";
 import ShareButton from "../components/wallpaper/ShareButton.jsx";
+import CollectionButton from "../components/wallpaper/CollectionButton.jsx";
 import WallpaperGrid from "../components/wallpaper/WallpaperGrid.jsx";
+import { getAspectRatioLabel, getOrientationLabel } from "../lib/orientation.js";
 import { useWallpaper } from "../hooks/useWallpaper.js";
 import { useWallpapers } from "../hooks/useWallpapers.js";
 
@@ -42,11 +43,8 @@ export default function WallpaperDetail() {
     .toLowerCase()
     .replace(/\s+/g, "-")}.jpg`;
 
-  const aspectLabel = wallpaper.orientation === "phone" ? "9:16" : "16:9";
-
-  const orientationLabel =
-    wallpaper.orientation === "phone" ? "Mobile" : "Desktop";
-
+  const aspectLabel = getAspectRatioLabel(wallpaper.orientation);
+  const orientationLabel = getOrientationLabel(wallpaper.orientation);
   const isPhone = wallpaper.orientation === "phone";
 
   return (
@@ -60,7 +58,9 @@ export default function WallpaperDetail() {
       </Link>
 
       <div className="grid lg:grid-cols-[minmax(0,1fr)_380px] gap-2xl lg:gap-4xl items-start">
-        {/* --- WALLPAPER PREVIEW --- */}
+        {/* =====================================================
+            WALLPAPER PREVIEW
+        ====================================================== */}
         <div className="min-w-0">
           <div
             className="
@@ -77,6 +77,12 @@ export default function WallpaperDetail() {
               flex
               items-center
               justify-center
+              max-md:h-auto
+              max-md:min-h-0
+              max-md:rounded-none
+              max-md:border-0
+              max-md:bg-transparent
+              max-md:overflow-visible
             "
           >
             <img
@@ -92,14 +98,16 @@ export default function WallpaperDetail() {
                 ${
                   isPhone
                     ? "max-h-[66vh] lg:max-h-[70vh]"
-                    : "w-full h-full object-contain"
+                    : "w-full h-full object-contain max-md:w-full max-md:h-auto max-md:max-h-none"
                 }
               `}
             />
           </div>
         </div>
 
-        {/* --- WALLPAPER INFORMATION --- */}
+        {/* =====================================================
+            WALLPAPER INFORMATION
+        ====================================================== */}
         <div className="lg:sticky lg:top-xl">
           {/* Title + mobile share */}
           <div className="flex items-start gap-md">
@@ -137,19 +145,17 @@ export default function WallpaperDetail() {
                 to={`/profile/${wallpaper.uploader}`}
                 className="inline-flex flex-col text-label text-ink hover:underline"
               >
-                <span>
-                  {wallpaper.uploaderDisplayName || `@${wallpaper.uploader}`}
-                </span>
-                <span className="text-ink-soft mt-xs">
-                  @{wallpaper.uploader}
-                </span>
+                <span>{wallpaper.uploaderDisplayName || `@${wallpaper.uploader}`}</span>
+                <span className="text-ink-soft mt-xs">@{wallpaper.uploader}</span>
               </Link>
             ) : (
               <p className="text-label text-ink-soft">Curated by HeyWalls</p>
             )}
           </div>
 
-          {/* --- DESKTOP ACTIONS --- */}
+          {/* =====================================================
+              DESKTOP ACTIONS
+          ====================================================== */}
           <div className="hidden lg:flex flex-wrap gap-sm">
             <DownloadButton
               imageUrl={wallpaper.fullImageUrl}

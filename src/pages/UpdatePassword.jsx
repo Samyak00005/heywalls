@@ -1,29 +1,34 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import AuthLayout from "../components/auth/AuthLayout.jsx";
-import PasswordInput from "../components/auth/PasswordInput.jsx";
-import { useToast } from "../components/common/ToastContext.jsx";
-import { useAuth } from "../context/AuthContext.jsx";
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import AuthLayout from '../components/auth/AuthLayout.jsx'
+import PasswordInput from '../components/auth/PasswordInput.jsx'
+import { useAuth } from '../context/AuthContext.jsx'
+import { useToast } from '../components/common/ToastContext.jsx'
 
+/**
+ * Reached via the link in the password-reset email. Supabase parses the
+ * recovery token from the URL and sets a temporary session automatically
+ * (handled by supabase-js) before this page renders.
+ */
 export default function UpdatePassword() {
-  const { updatePassword } = useAuth();
-  const { showToast } = useToast();
-  const navigate = useNavigate();
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const { updatePassword } = useAuth()
+  const { showToast } = useToast()
+  const navigate = useNavigate()
+  const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
 
   async function handleSubmit(e) {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-    const { error } = await updatePassword(password);
-    setLoading(false);
+    e.preventDefault()
+    setLoading(true)
+    setError(null)
+    const { error } = await updatePassword(password)
+    setLoading(false)
     if (error) {
-      setError(error.message);
+      setError(error.message)
     } else {
-      showToast("Password updated successfully.");
-      navigate("/");
+      showToast('Password updated successfully.')
+      navigate('/')
     }
   }
 
@@ -48,9 +53,9 @@ export default function UpdatePassword() {
           disabled={loading}
           className="bg-accent text-accent-contrast rounded-md px-lg py-sm text-body font-medium disabled:opacity-60"
         >
-          {loading ? "Saving…" : "Update password"}
+          {loading ? 'Saving…' : 'Update password'}
         </button>
       </form>
     </AuthLayout>
-  );
+  )
 }

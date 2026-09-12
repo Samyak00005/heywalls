@@ -1,25 +1,25 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import AuthLayout from "../components/auth/AuthLayout.jsx";
-import { useAuth } from "../context/AuthContext.jsx";
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import AuthLayout from '../components/auth/AuthLayout.jsx'
+import { useAuth } from '../context/AuthContext.jsx'
 
 export default function ForgotPassword() {
-  const { resetPassword } = useAuth();
-  const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [sent, setSent] = useState(false);
+  const { resetPassword } = useAuth()
+  const [email, setEmail] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
+  const [sent, setSent] = useState(false)
 
   async function handleSubmit(e) {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-    const { error } = await resetPassword(email);
-    setLoading(false);
+    e.preventDefault()
+    setLoading(true)
+    setError(null)
+    const { error } = await resetPassword(email)
+    setLoading(false)
     if (error) {
-      setError(error.message);
+      setError(error.message)
     } else {
-      setSent(true);
+      setSent(true)
     }
   }
 
@@ -28,10 +28,11 @@ export default function ForgotPassword() {
       <AuthLayout>
         <h1 className="font-display text-h1 mb-lg">Check your email</h1>
         <p className="text-body-sm text-ink-soft">
-          If an account exists for {email}, a password reset link is on its way.
+          If an account exists for {email}, a password reset link is on its
+          way.
         </p>
       </AuthLayout>
-    );
+    )
   }
 
   return (
@@ -56,15 +57,12 @@ export default function ForgotPassword() {
           disabled={loading}
           className="bg-accent text-accent-contrast rounded-md px-lg py-sm text-body font-medium disabled:opacity-60"
         >
-          {loading ? "Sending…" : "Send reset link"}
+          {loading ? 'Sending…' : 'Send reset link'}
         </button>
       </form>
-      <Link
-        to="/login"
-        className="text-body-sm text-ink-soft hover:text-ink mt-lg inline-block"
-      >
+      <Link to="/login" className="text-body-sm text-ink-soft hover:text-ink mt-lg inline-block">
         Back to sign in
       </Link>
     </AuthLayout>
-  );
+  )
 }

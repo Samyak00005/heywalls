@@ -1,39 +1,39 @@
-import { useEffect, useState } from "react";
-import { supabase } from "../lib/supabaseClient.js";
+import { useEffect, useState } from 'react'
+import { supabase } from '../lib/supabaseClient.js'
 
 export function useCategories() {
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [categories, setCategories] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
-    let active = true;
+    let active = true
 
     async function load() {
-      setLoading(true);
-      setError(null);
+      setLoading(true)
+      setError(null)
 
       const { data, error } = await supabase
-        .from("categories")
-        .select("id, name, slug, hex_color")
-        .order("name", { ascending: true });
+        .from('categories')
+        .select('id, name, slug, hex_color')
+        .order('name', { ascending: true })
 
-      if (!active) return;
+      if (!active) return
 
       if (error) {
-        setError(error);
-        setCategories([]);
+        setError(error)
+        setCategories([])
       } else {
-        setCategories(data || []);
+        setCategories(data || [])
       }
-      setLoading(false);
+      setLoading(false)
     }
 
-    load();
+    load()
     return () => {
-      active = false;
-    };
-  }, []);
+      active = false
+    }
+  }, [])
 
-  return { categories, setCategories, loading, error };
+  return { categories, setCategories, loading, error }
 }

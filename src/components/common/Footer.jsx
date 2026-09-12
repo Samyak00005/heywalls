@@ -1,5 +1,5 @@
-import { Link } from "react-router-dom";
-import logo from "../../assets/logo.png";
+import { Link } from 'react-router-dom'
+import logo from '../../assets/logo.png'
 
 export default function Footer() {
   return (
@@ -9,44 +9,28 @@ export default function Footer() {
           <div>
             <Link to="/" className="inline-flex items-center gap-sm">
               <img src={logo} alt="HeyWalls" className="h-7 w-auto" />
-              <span className="font-display italic text-h3 text-ink">
-                HeyWalls
-              </span>
+              <span className="font-display italic text-h3 text-ink">HeyWalls</span>
             </Link>
             <p className="mt-md max-w-[420px] text-body-sm text-ink-soft">
-              Walls worth living with. A simple home for desktop and phone
-              wallpapers, curated by us and shared by the community.
+              Walls worth living with. A simple home for desktop, tablet, and phone wallpapers,
+              curated by us and shared by the community.
             </p>
           </div>
 
           <div>
-            <p className="text-label uppercase tracking-[0.08em] text-ink-soft mb-md">
-              Explore
-            </p>
+            <p className="text-label uppercase tracking-[0.08em] text-ink-soft mb-md">Explore</p>
             <nav className="flex flex-col gap-sm text-body-sm">
-              <Link to="/explore" className="hover:text-ink">
-                Browse wallpapers
-              </Link>
-              <Link to="/category/nature" className="hover:text-ink">
-                Browse by mood
-              </Link>
+              <Link to="/explore" className="hover:text-ink">Browse wallpapers</Link>
+              <Link to="/category/nature" className="hover:text-ink">Browse by mood</Link>
             </nav>
           </div>
 
           <div>
-            <p className="text-label uppercase tracking-[0.08em] text-ink-soft mb-md">
-              Your space
-            </p>
+            <p className="text-label uppercase tracking-[0.08em] text-ink-soft mb-md">Your space</p>
             <nav className="flex flex-col gap-sm text-body-sm">
-              <Link to="/upload" className="hover:text-ink">
-                Upload a wallpaper
-              </Link>
-              <Link to="/account/uploads" className="hover:text-ink">
-                My wallpapers
-              </Link>
-              <Link to="/collections" className="hover:text-ink">
-                Collections
-              </Link>
+              <Link to="/upload" className="hover:text-ink">Upload a wallpaper</Link>
+              <Link to="/account/uploads" className="hover:text-ink">My wallpapers</Link>
+              <Link to="/collections" className="hover:text-ink">Collections</Link>
             </nav>
           </div>
         </div>
@@ -57,5 +41,5 @@ export default function Footer() {
         </div>
       </div>
     </footer>
-  );
+  )
 }

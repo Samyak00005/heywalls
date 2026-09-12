@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=Work+Sans:wght@400;500;600&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=Work+Sans:wght@400;500;600&display=swap');
 @import "tailwindcss";
 
 /*
@@ -10,18 +10,18 @@
 
 @theme {
   /* Color */
-  --color-bg: #eeeae2;
-  --color-surface: #e4dfd2;
-  --color-ink: #201e1b;
-  --color-ink-soft: #6b6459;
-  --color-line: #c9c2b4;
-  --color-accent: #3e5641;
-  --color-accent-2: #a6553c;
-  --color-accent-contrast: #f4f1e9;
+  --color-bg: #EEEAE2;
+  --color-surface: #E4DFD2;
+  --color-ink: #201E1B;
+  --color-ink-soft: #6B6459;
+  --color-line: #C9C2B4;
+  --color-accent: #3E5641;
+  --color-accent-2: #A6553C;
+  --color-accent-contrast: #F4F1E9;
 
   /* Type */
-  --font-display: "Fraunces", serif;
-  --font-ui: "Work Sans", sans-serif;
+  --font-display: 'Fraunces', serif;
+  --font-ui: 'Work Sans', sans-serif;
 
   --text-display: 38px;
   --text-display--line-height: 1.05;
@@ -41,11 +41,11 @@
   /* Spacing (8px grid). Named to avoid colliding with Tailwind's own
      numeric spacing scale (p-4, gap-8, etc. are Tailwind's defaults and
      do NOT match our scale past the 16px step) — always use these. */
-  --spacing-xs: 4px; /* space-1 */
-  --spacing-sm: 8px; /* space-2 */
-  --spacing-md: 12px; /* space-3 */
-  --spacing-lg: 16px; /* space-4 — card padding, always */
-  --spacing-xl: 24px; /* space-5 */
+  --spacing-xs: 4px;   /* space-1 */
+  --spacing-sm: 8px;   /* space-2 */
+  --spacing-md: 12px;  /* space-3 */
+  --spacing-lg: 16px;  /* space-4 — card padding, always */
+  --spacing-xl: 24px;  /* space-5 */
   --spacing-2xl: 32px; /* space-6 */
   --spacing-3xl: 48px; /* space-7 — section gap mobile, gutter desktop */
   --spacing-4xl: 64px; /* space-8 — section gap desktop */
@@ -115,10 +115,7 @@ select,
   -webkit-user-select: text;
 }
 
-h1,
-h2,
-h3,
-.font-display {
+h1, h2, h3, .font-display {
   font-family: var(--font-display);
 }
 
@@ -140,13 +137,8 @@ h3,
 }
 
 /* Quiet, consistent interaction motion across the site. */
-a,
-button,
-input,
-textarea,
-select {
-  transition-property:
-    color, background-color, border-color, opacity, box-shadow, transform;
+a, button, input, textarea, select {
+  transition-property: color, background-color, border-color, opacity, box-shadow, transform;
   transition-duration: 160ms;
   transition-timing-function: ease-out;
 }
@@ -171,9 +163,7 @@ button:disabled {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  *, *::before, *::after {
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
@@ -185,12 +175,14 @@ button:disabled {
    Wrapping any subtree in this class re-themes every existing component
    automatically, since utilities like bg-bg/text-ink read these vars. */
 .admin-theme {
-  --color-bg: #201f1b;
-  --color-surface: #2b2a24;
-  --color-ink: #f2efe6;
-  --color-ink-soft: #a39c8c;
-  --color-line: #423f35;
+  --color-bg: #201F1B;
+  --color-surface: #2B2A24;
+  --color-ink: #F2EFE6;
+  --color-ink-soft: #A39C8C;
+  --color-line: #423F35;
 }
+
+
 
 /* V5 responsive polish */
 @media (max-width: 719px) {
@@ -234,7 +226,7 @@ button:disabled {
   font-size: 10px;
   line-height: 1;
   text-transform: uppercase;
-  letter-spacing: 0.16em;
+  letter-spacing: .16em;
   color: var(--color-ink-soft);
 }
 
@@ -259,10 +251,7 @@ button:disabled {
   color: var(--color-ink-soft);
   font-size: var(--text-body-sm);
   line-height: 1.4;
-  transition:
-    background-color 0.15s ease,
-    color 0.15s ease,
-    border-color 0.15s ease;
+  transition: background-color .15s ease, color .15s ease, border-color .15s ease;
 }
 
 .admin-nav-item:hover {
@@ -458,8 +447,7 @@ button:disabled {
   opacity: 1;
 }
 
-/* Wallpaper actions stay hidden until the specific card is hovered. On touch devices,
-   keep them visible because there is no hover state. */
+/* Wallpaper actions stay hidden until the specific card is hovered. */
 .wallpaper-card-actions {
   opacity: 0;
 }
@@ -469,9 +457,9 @@ button:disabled {
   opacity: 1;
 }
 
-@media (hover: none) {
+@media (max-width: 767px) {
   .wallpaper-card-actions {
-    opacity: 1;
+    display: none;
   }
 }
 

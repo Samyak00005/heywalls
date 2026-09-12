@@ -1,64 +1,62 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext.jsx";
-import { ADMIN_ONLY_LOGIN } from "../../lib/featureFlags.js";
-import { supabase } from "../../lib/supabaseClient.js";
-import PasswordInput from "./PasswordInput.jsx";
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../../context/AuthContext.jsx'
+import { ADMIN_ONLY_LOGIN } from '../../lib/featureFlags.js'
+import { supabase } from '../../lib/supabaseClient.js'
+import PasswordInput from './PasswordInput.jsx'
 
 /**
  * mode: 'login' | 'signup'
  * onSuccess: called after a successful sign-in/sign-up
  */
 export default function AuthForm({ mode, onSuccess, prefillEmail }) {
-  const { signIn, signUp, signOut } = useAuth();
-  const navigate = useNavigate();
-  const [displayName, setDisplayName] = useState("");
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState(prefillEmail || "");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const { signIn, signUp, signOut } = useAuth()
+  const navigate = useNavigate()
+  const [displayName, setDisplayName] = useState('')
+  const [username, setUsername] = useState('')
+  const [email, setEmail] = useState(prefillEmail || '')
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
 
   async function handleSubmit(e) {
-    e.preventDefault();
-    setError(null);
+    e.preventDefault()
+    setError(null)
 
-    if (mode === "signup" && password !== confirmPassword) {
-      setError("Passwords don't match.");
-      return;
+    if (mode === 'signup' && password !== confirmPassword) {
+      setError("Passwords don't match.")
+      return
     }
 
-    setLoading(true);
+    setLoading(true)
 
-    if (mode === "login") {
-      const { data, error } = await signIn(email, password);
+    if (mode === 'login') {
+      const { data, error } = await signIn(email, password)
       if (error) {
-        setLoading(false);
-        setError(error.message);
-        return;
+        setLoading(false)
+        setError(error.message)
+        return
       }
 
       if (ADMIN_ONLY_LOGIN) {
         const { data: profileRow } = await supabase
-          .from("profiles")
-          .select("role")
-          .eq("id", data.user.id)
-          .single();
+          .from('profiles')
+          .select('role')
+          .eq('id', data.user.id)
+          .single()
 
-        if (profileRow?.role !== "admin") {
-          await signOut();
-          setLoading(false);
-          setError(
-            "HeyWalls is in private beta right now — admin access only.",
-          );
-          return;
+        if (profileRow?.role !== 'admin') {
+          await signOut()
+          setLoading(false)
+          setError('HeyWalls is in private beta right now — admin access only.')
+          return
         }
       }
 
-      setLoading(false);
-      onSuccess?.(data);
-      return;
+      setLoading(false)
+      onSuccess?.(data)
+      return
     }
 
     const { data, error } = await signUp(
@@ -66,12 +64,12 @@ export default function AuthForm({ mode, onSuccess, prefillEmail }) {
       password,
       username.trim() || undefined,
       displayName.trim() || undefined,
-    );
-    setLoading(false);
+    )
+    setLoading(false)
 
     if (error) {
-      setError(error.message);
-      return;
+      setError(error.message)
+      return
     }
 
     // Supabase returns a "successful" signUp with an empty identities
@@ -79,22 +77,17 @@ export default function AuthForm({ mode, onSuccess, prefillEmail }) {
     // to avoid leaking which emails exist. Treat it as already-registered
     // and send them to sign in instead of a false "check your email".
     if (data?.user && data.user.identities?.length === 0) {
-      setError(
-        "You already have an account with us — redirecting you to sign in…",
-      );
-      setTimeout(
-        () => navigate("/login", { state: { prefillEmail: email } }),
-        1500,
-      );
-      return;
+      setError('You already have an account with us — redirecting you to sign in…')
+      setTimeout(() => navigate('/login', { state: { prefillEmail: email } }), 1500)
+      return
     }
 
-    onSuccess?.(data);
+    onSuccess?.(data)
   }
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-lg">
-      {mode === "signup" && (
+      {mode === 'signup' && (
         <>
           <label className="flex flex-col gap-xs">
             <span className="text-label text-ink-soft">Name</span>
@@ -137,11 +130,11 @@ export default function AuthForm({ mode, onSuccess, prefillEmail }) {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           minLength={6}
-          autoComplete={mode === "signup" ? "new-password" : "current-password"}
+          autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
         />
       </label>
 
-      {mode === "signup" && (
+      {mode === 'signup' && (
         <label className="flex flex-col gap-xs">
           <span className="text-label text-ink-soft">Confirm password</span>
           <PasswordInput
@@ -161,11 +154,11 @@ export default function AuthForm({ mode, onSuccess, prefillEmail }) {
         className="bg-accent text-accent-contrast rounded-md px-lg py-sm text-body font-medium disabled:opacity-60"
       >
         {loading
-          ? "Please wait…"
-          : mode === "signup"
-            ? "Create account"
-            : "Sign in"}
+          ? 'Please wait…'
+          : mode === 'signup'
+            ? 'Create account'
+            : 'Sign in'}
       </button>
     </form>
-  );
+  )
 }
