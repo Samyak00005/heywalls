@@ -6,6 +6,7 @@ import AccountSettings from '../pages/AccountSettings.jsx'
 import Category from '../pages/Category.jsx'
 import CollectionDetail from '../pages/CollectionDetail.jsx'
 import Collections from '../pages/Collections.jsx'
+import Creators from '../pages/Creators.jsx'
 import Explore from '../pages/Explore.jsx'
 import Favorites from '../pages/Favorites.jsx'
 import ForgotPassword from '../pages/ForgotPassword.jsx'
@@ -28,6 +29,7 @@ export default function AppRoutes() {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/explore" element={<Explore />} />
+      <Route path="/creators" element={<Creators />} />
       <Route path="/category/:slug" element={<Category />} />
       <Route path="/wallpaper/:id" element={<WallpaperDetail />} />
 

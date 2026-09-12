@@ -4,6 +4,7 @@ import {
   Menu,
   X,
   Compass,
+  Users,
   Heart,
   Image,
   UserCircle,
@@ -40,6 +41,11 @@ export default function Navbar() {
       to: "/explore",
       label: "Explore",
       icon: Compass,
+    },
+    {
+      to: "/creators",
+      label: "Creators",
+      icon: Users,
     },
 
     ...(user

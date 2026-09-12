@@ -22,6 +22,7 @@ export default function Footer() {
             <nav className="flex flex-col gap-sm text-body-sm">
               <Link to="/explore" className="hover:text-ink">Browse wallpapers</Link>
               <Link to="/category/nature" className="hover:text-ink">Browse by mood</Link>
+              <Link to="/creators" className="hover:text-ink">Creators</Link>
             </nav>
           </div>
 
