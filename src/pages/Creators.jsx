@@ -1,4 +1,4 @@
-import { Search, UserCircle } from 'lucide-react'
+import { ArrowUpRight, Search } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ErrorState, LoadingState } from '../components/common/DataState.jsx'
@@ -120,7 +120,7 @@ export default function Creators() {
               </p>
             </div>
           ) : (
-            <div className="grid gap-md sm:grid-cols-2 lg:grid-cols-3">
+            <div className="border-t border-line">
               {filteredCreators.map((creator) => {
                 const displayName = creator.display_name?.trim() || creator.username
                 const initials = displayName.charAt(0).toUpperCase()
@@ -128,48 +128,32 @@ export default function Creators() {
                 return (
                   <Link
                     key={creator.id}
-                    to={`/profile/${creator.username}`}
-                    className="group border border-line rounded-md bg-surface p-lg transition-colors hover:border-ink"
+                    to={`/creator/${creator.username}`}
+                    className="group grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-md border-b border-line py-lg"
                   >
-                    <div className="flex items-start gap-md">
-                      <div className="w-12 h-12 rounded-full border border-line bg-bg flex items-center justify-center shrink-0 overflow-hidden">
-                        {creator.avatar_url ? (
-                          <img
-                            src={creator.avatar_url}
-                            alt=""
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <span className="font-display text-h3">{initials}</span>
-                        )}
-                      </div>
-
-                      <div className="min-w-0 flex-1">
-                        <h2 className="font-display text-h3 truncate group-hover:underline underline-offset-4">
-                          {displayName}
-                        </h2>
-                        <p className="text-body-sm text-ink-soft mt-xs">@{creator.username}</p>
-                      </div>
-
-                      <UserCircle
-                        size={18}
-                        strokeWidth={1.7}
-                        className="shrink-0 text-ink-soft"
-                      />
+                    <div className="w-12 h-12 rounded-full border border-line bg-surface flex items-center justify-center shrink-0 overflow-hidden">
+                      {creator.avatar_url ? (
+                        <img src={creator.avatar_url} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        <span className="font-display text-h3">{initials}</span>
+                      )}
                     </div>
 
-                    {creator.bio?.trim() && (
-                      <p className="text-body-sm text-ink-soft mt-lg line-clamp-2">
-                        {creator.bio.trim()}
-                      </p>
-                    )}
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-baseline gap-x-sm gap-y-0">
+                        <h2 className="font-display text-h3 truncate group-hover:underline underline-offset-4">{displayName}</h2>
+                        <span className="text-body-sm text-ink-soft">@{creator.username}</span>
+                      </div>
+                      {creator.bio?.trim() && (
+                        <p className="text-body-sm text-ink-soft mt-xs line-clamp-1 max-w-[720px]">{creator.bio.trim()}</p>
+                      )}
+                    </div>
 
-                    <div className="mt-lg pt-md border-t border-line flex items-center justify-between gap-md">
-                      <span className="text-label text-ink-soft">
-                        {creator.wallpaperCount}{' '}
-                        {creator.wallpaperCount === 1 ? 'wallpaper' : 'wallpapers'}
+                    <div className="flex items-center gap-lg">
+                      <span className="hidden sm:inline text-label text-ink-soft whitespace-nowrap">
+                        {creator.wallpaperCount} {creator.wallpaperCount === 1 ? 'wallpaper' : 'wallpapers'}
                       </span>
-                      <span className="text-label text-ink">View profile →</span>
+                      <ArrowUpRight size={18} strokeWidth={1.7} className="text-ink-soft transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden="true" />
                     </div>
                   </Link>
                 )

@@ -142,7 +142,7 @@ export default function WallpaperDetail() {
               Published by:{' '}
               {wallpaper.uploader ? (
                 <Link
-                  to={`/profile/${wallpaper.uploader}`}
+                  to={`/creator/${wallpaper.uploader}`}
                   className="text-ink hover:underline underline-offset-4"
                 >
                   @{wallpaper.uploader}

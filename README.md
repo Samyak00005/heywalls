@@ -2,10 +2,8 @@
 
 A wallpaper site — curated + community uploads, desktop and phone.
 
-This is the **Phase 0** scaffold: project setup, theme tokens, routing, and the
-Supabase client are wired up. See `HeyWalls-Phases.md` in the planning docs for
-what comes next, and `PROGRESS.md` for a phase-by-phase log of what's actually
-been built.
+The current build is **HeyWalls v20.2**. See `VERSION_HISTORY.md` for the
+complete version history and a single source of truth for what has been built.
 
 ## Get it running locally
 
