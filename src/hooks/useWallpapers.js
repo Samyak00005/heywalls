@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { readWallpaperCache, writeWallpaperCache } from '../lib/wallpaperCache.js'
 import { mapWallhavenWallpaper } from '../lib/wallpaperMapper.js'
+import { readWallpaperCache, writeWallpaperCache } from '../lib/wallpaperCache.js'
 
 const CACHE_KEY = 'wallhaven-latest-v2'
 const CACHE_MAX_AGE = 10 * 60 * 1000
@@ -59,8 +59,7 @@ export function useWallpapers(options = {}) {
   const [page, setPage] = useState(cached?.page ?? 1)
   const requestId = useRef(0)
   const wallpapersRef = useRef(cached?.items || [])
-  const randomSeed = useRef(null)
-  if (!randomSeed.current) randomSeed.current = createRandomSeed()
+  const [randomSeed] = useState(createRandomSeed)
 
   const loadPage = useCallback(async (nextPage, append = false) => {
     const currentRequest = ++requestId.current
@@ -90,7 +89,7 @@ export function useWallpapers(options = {}) {
         if (order === 'asc') params.set('order', order)
         if (effectiveQuery) params.set('q', effectiveQuery)
         if (apiCategory) params.set('apiCategory', apiCategory)
-        if (sort === 'random') params.set('seed', randomSeed.current)
+        if (sort === 'random') params.set('seed', randomSeed)
 
         const response = await fetch(`/api/wallhaven?${params.toString()}`)
         const responseBody = await response.text()
@@ -100,7 +99,10 @@ export function useWallpapers(options = {}) {
         } catch {
           throw new Error('The wallpaper service returned an invalid response. Please try again shortly.')
         }
-        if (!response.ok) throw new Error(result.error || 'Could not load wallpapers.')
+        if (!response.ok) throw new Error(result?.error || 'Could not load wallpapers.')
+        if (!result || !Array.isArray(result.data)) {
+          throw new Error('The wallpaper service returned an unexpected response. Please try again shortly.')
+        }
         if (currentRequest !== requestId.current) return false
 
         resultMeta = result.meta || null
@@ -151,7 +153,7 @@ export function useWallpapers(options = {}) {
       setLoadingMore(false)
       return false
     }
-  }, [apiCategory, effectiveQuery, isDefaultCatalog, orientation, sort])
+  }, [apiCategory, effectiveQuery, isDefaultCatalog, orientation, randomSeed, sort])
 
   useEffect(() => {
     requestId.current += 1

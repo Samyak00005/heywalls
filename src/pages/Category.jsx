@@ -14,7 +14,7 @@ export default function Category() {
   const [searchParams] = useSearchParams()
   const apiCategory = searchParams.get('apiCategory') || ''
   const topic = getWallpaperTopic(slug)
-  const { wallpapers, loading, loadingMore, error, loadMoreError, hasMore, loadMore } = useWallpapers(
+  const { wallpapers, loading, loadingMore, error, loadMoreError, hasMore, loadMore, retry } = useWallpapers(
     apiCategory ? { apiCategory } : { categorySlug: topic?.query || slug.replace(/-/g, ' ') },
   )
 
@@ -25,7 +25,7 @@ export default function Category() {
       <h1 className="font-display text-h1 mb-xl">{topic?.name || titleCase(slug)}</h1>
 
       {loading && <WallpaperGridSkeleton count={20} />}
-      {error && <ErrorState error={error} />}
+      {error && <ErrorState error={error} onRetry={retry} />}
       {!loading && !error && (
         <>
           <WallpaperGrid wallpapers={wallpapers} />

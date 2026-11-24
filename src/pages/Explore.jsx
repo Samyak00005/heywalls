@@ -1,38 +1,29 @@
-import { useEffect, useState } from 'react'
 import { ArrowDown } from 'lucide-react'
-import { useLocation } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 import { ErrorState } from '../components/common/DataState.jsx'
 import FilterBar from '../components/wallpaper/FilterBar.jsx'
 import WallpaperGrid, { WallpaperGridSkeleton } from '../components/wallpaper/WallpaperGrid.jsx'
 import { useWallpapers } from '../hooks/useWallpapers.js'
 
 export default function Explore() {
-  const location = useLocation()
-  const params = new URLSearchParams(location.search)
-  const [query, setQuery] = useState(params.get('q') || '')
-  const [orientation, setOrientation] = useState(params.get('orientation') || params.get('device') || 'all')
-  const [sort, setSort] = useState(params.get('sort') || 'newest')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const query = searchParams.get('q') || ''
+  const orientation = searchParams.get('orientation') || searchParams.get('device') || 'all'
+  const sort = searchParams.get('sort') || 'newest'
   const { wallpapers, loading, loadingMore, error, loadMoreError, hasMore, loadMore, retry, totalCount } = useWallpapers({
     query,
     orientation,
     sort,
   })
 
-  useEffect(() => {
-    const incoming = new URLSearchParams(location.search)
-    setQuery(incoming.get('q') || '')
-    setOrientation(incoming.get('orientation') || incoming.get('device') || 'all')
-    setSort(incoming.get('sort') || 'newest')
-  }, [location.search])
-
-  useEffect(() => {
+  function updateFilter(key, value, defaultValue) {
     const next = new URLSearchParams()
-    if (query.trim()) next.set('q', query.trim())
-    if (orientation !== 'all') next.set('orientation', orientation)
-    if (sort !== 'newest') next.set('sort', sort)
-    const nextUrl = next.toString() ? `/explore?${next.toString()}` : '/explore'
-    window.history.replaceState(null, '', nextUrl)
-  }, [location.pathname, orientation, query, sort])
+    for (const [name, currentValue] of searchParams.entries()) {
+      if (name !== key && name !== 'device') next.set(name, currentValue)
+    }
+    if (value !== defaultValue) next.set(key, value)
+    setSearchParams(next, { replace: true })
+  }
 
   return (
     <div className="container-page pt-xl pb-3xl md:pb-4xl">
@@ -46,12 +37,11 @@ export default function Explore() {
 
       <FilterBar
         activeOrientation={orientation}
-        onOrientationChange={setOrientation}
+        onOrientationChange={(value) => updateFilter('orientation', value, 'all')}
         query={query}
-        onQueryChange={setQuery}
         showQuery={false}
         sort={sort}
-        onSortChange={setSort}
+        onSortChange={(value) => updateFilter('sort', value, 'newest')}
       />
 
       {loading && <WallpaperGridSkeleton count={orientation === 'all' ? 8 : 20} />}

@@ -1,11 +1,6 @@
 export function WallpaperDetailSkeleton() {
   return (
-    <div
-      className="container-page animate-pulse pt-xl pb-3xl md:pb-4xl"
-      role="status"
-      aria-label="Loading wallpaper details"
-      aria-busy="true"
-    >
+    <div className="container-page animate-pulse pt-xl pb-3xl md:pb-4xl" role="status" aria-label="Loading wallpaper details" aria-busy="true">
       <div className="mb-lg h-3 w-32 rounded bg-line/60" />
       <div className="grid items-start gap-2xl lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-4xl">
         <div className="aspect-[4/3] min-h-[280px] rounded-md bg-surface lg:aspect-auto lg:h-[68vh]" />
@@ -22,15 +17,13 @@ export function WallpaperDetailSkeleton() {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 export function ErrorState({ error, onRetry }) {
   return (
-    <div className="border border-line rounded-md p-xl text-center">
-      <p className="text-body text-ink mb-sm">
-        The wallpaper feed is unavailable right now.
-      </p>
+    <div className="border border-line rounded-md p-xl text-center" role="alert" aria-live="assertive">
+      <p className="text-body text-ink mb-sm">The wallpaper feed is unavailable right now.</p>
       <p className="text-body-sm text-ink-soft max-w-[420px] mx-auto">
         Check your connection or try again in a moment.
       </p>
@@ -38,14 +31,10 @@ export function ErrorState({ error, onRetry }) {
         <p className="text-label text-ink-soft mt-sm">({error.message})</p>
       )}
       {onRetry && (
-        <button
-          type="button"
-          onClick={onRetry}
-          className="mt-lg rounded-md border border-line bg-surface px-lg py-sm text-body-sm text-ink hover:border-ink-soft"
-        >
+        <button type="button" onClick={onRetry} className="mt-lg rounded-md border border-line bg-surface px-lg py-sm text-body-sm text-ink hover:border-ink-soft">
           Try again
         </button>
       )}
     </div>
-  );
+  )
 }

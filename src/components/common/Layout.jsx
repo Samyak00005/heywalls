@@ -1,5 +1,5 @@
-import Footer from "./Footer.jsx";
-import Navbar from "./Navbar.jsx";
+import Footer from './Footer.jsx'
+import Navbar from './Navbar.jsx'
 
 export default function Layout({ children }) {
   return (
@@ -8,5 +8,5 @@ export default function Layout({ children }) {
       <main className="flex-1">{children}</main>
       <Footer />
     </div>
-  );
+  )
 }

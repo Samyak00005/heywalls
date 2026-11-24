@@ -1,4 +1,4 @@
-import { Check, X } from "lucide-react";
+import { AlertCircle, Check, X } from "lucide-react";
 import {
   createContext,
   useCallback,
@@ -41,8 +41,8 @@ export function ToastProvider({ children }) {
           aria-live="polite"
         >
           <div className="toast-enter pointer-events-auto flex w-full items-center gap-sm border border-line bg-surface px-md py-sm shadow-hung rounded-md">
-            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent text-accent-contrast">
-              <Check size={15} strokeWidth={2} />
+            <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-accent-contrast ${toast.type === "error" ? "bg-accent-2" : "bg-accent"}`}>
+              {toast.type === "error" ? <AlertCircle size={15} strokeWidth={2} /> : <Check size={15} strokeWidth={2} />}
             </span>
             <p className="min-w-0 flex-1 text-body-sm text-ink">
               {toast.message}

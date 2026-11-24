@@ -26,7 +26,7 @@ function MetaItem({ icon: Icon, label, value }) {
 
 export default function WallpaperDetail() {
   const { id } = useParams()
-  const { wallpaper, loading, error } = useWallpaper(id)
+  const { wallpaper, loading, error, retry } = useWallpaper(id)
   const { wallpapers } = useWallpapers()
 
   const related = useMemo(() => {
@@ -52,7 +52,7 @@ export default function WallpaperDetail() {
   if (error || !wallpaper) {
     return (
       <div className="container-page pt-xl pb-3xl">
-        <ErrorState error={error} />
+        <ErrorState error={error} onRetry={retry} />
       </div>
     )
   }
@@ -114,8 +114,12 @@ export default function WallpaperDetail() {
           </div>
 
           {wallpaper.description && (
-            <p className="text-body text-ink-soft mt-md mb-xl max-w-[520px]">
-              {wallpaper.description}
+            <p
+              className="mt-md mb-xl max-w-full truncate whitespace-nowrap text-body-sm text-ink-soft"
+              title={wallpaper.description}
+              aria-label={`Wallpaper tags: ${wallpaper.description}`}
+            >
+              {wallpaper.tags?.length ? wallpaper.tags.slice(0, 3).join(' · ') : wallpaper.description}
             </p>
           )}
 
@@ -129,15 +133,22 @@ export default function WallpaperDetail() {
             <MetaItem icon={Heart} label="Category" value={wallpaper.category || 'Uncategorized'} />
           </div>
 
-          <div className="border-t border-line pt-lg mb-xl">
-            <p className="text-body-sm text-ink-soft">
-              Wallpaper hosted by{' '}
-              <a href={wallpaper.sourceUrl} target="_blank" rel="noreferrer" className="text-ink hover:underline">
-                {wallpaper.source}
-              </a>
-              {wallpaper.uploader && <span> · uploaded by @{wallpaper.uploader}</span>}
-            </p>
-          </div>
+          {wallpaper.uploader && (
+            <div className="border-t border-line pt-lg mb-xl">
+              <p className="text-body-sm text-ink-soft">
+                Uploaded by{' '}
+                <a
+                  href={wallpaper.sourceUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={`Open the original wallpaper page for uploader ${wallpaper.uploader}`}
+                  className="text-ink hover:underline"
+                >
+                  @{wallpaper.uploader}
+                </a>
+              </p>
+            </div>
+          )}
           <div className="flex flex-col gap-sm">
             <div className="w-full">
               <DownloadButton

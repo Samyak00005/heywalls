@@ -8,13 +8,13 @@ function readSavedWallpapers() {
     const value = JSON.parse(window.localStorage.getItem(STORAGE_KEY) || '[]')
     return Array.isArray(value)
       ? value
-        .filter((item) => item?.id && item?.imageUrl)
-        .map((item) => ({
-          ...item,
-          imageUrl: item.imageUrl.includes('th.wallhaven.cc/lg/')
-            ? item.imageUrl.replace('/lg/', '/orig/')
-            : item.imageUrl,
-        }))
+          .filter((item) => item?.id && item?.imageUrl)
+          .map((item) => ({
+            ...item,
+            imageUrl: item.imageUrl.includes('th.wallhaven.cc/lg/')
+              ? item.imageUrl.replace('/lg/', '/orig/')
+              : item.imageUrl,
+          }))
       : []
   } catch {
     return []
@@ -24,10 +24,11 @@ function readSavedWallpapers() {
 function saveWallpapers(items) {
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items))
+    window.dispatchEvent(new Event(CHANGE_EVENT))
+    return true
   } catch {
-    // Keep the current session usable when browser storage is unavailable.
+    return false
   }
-  window.dispatchEvent(new Event(CHANGE_EVENT))
 }
 
 export function useFavorites() {
@@ -52,8 +53,9 @@ export function useFavorites() {
     const next = current.some((item) => item.id === wallpaper.id)
       ? current.filter((item) => item.id !== wallpaper.id)
       : [wallpaper, ...current]
-    saveWallpapers(next)
+    if (!saveWallpapers(next)) return false
     setFavorites(next)
+    return true
   }, [])
 
   return { favorites, favoriteIds, isFavorite, toggle }

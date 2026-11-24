@@ -9,26 +9,31 @@ export default async function handler(request, response) {
     return response.status(405).json({ error: 'Only GET requests are supported.' })
   }
 
-  const id = String(request.query.id || '').trim()
+  const params = request.query || {}
+  const id = String(params.id || '').trim()
+  if (id && !/^[a-zA-Z0-9]{6}$/.test(id)) {
+    response.setHeader('Cache-Control', 'no-store')
+    return response.status(400).json({ error: 'Wallpaper ID is invalid.' })
+  }
   const upstreamUrl = id
     ? new URL(`${WALLHAVEN_API}/w/${encodeURIComponent(id)}`)
     : new URL(`${WALLHAVEN_API}/search`)
 
   if (!id) {
-    const query = String(request.query.q || '').trim().slice(0, 100)
-    const page = Number.parseInt(request.query.page, 10)
-    const sorting = String(request.query.sorting || 'date_added')
+    const query = String(params.q || '').trim().slice(0, 100)
+    const page = Number.parseInt(params.page, 10)
+    const sorting = String(params.sorting || 'date_added')
 
     upstreamUrl.searchParams.set('purity', '100')
-    const apiCategory = String(request.query.apiCategory || '').trim().toLowerCase()
+    const apiCategory = String(params.apiCategory || '').trim().toLowerCase()
     const categoriesMask = Object.hasOwn(API_CATEGORIES, apiCategory) ? API_CATEGORIES[apiCategory] : '111'
     upstreamUrl.searchParams.set('categories', categoriesMask)
     upstreamUrl.searchParams.set('page', String(Number.isFinite(page) ? Math.max(1, Math.min(page, 100)) : 1))
     upstreamUrl.searchParams.set('sorting', SORTS.has(sorting) ? sorting : 'date_added')
 
-    if (request.query.order === 'asc') upstreamUrl.searchParams.set('order', 'asc')
+    if (params.order === 'asc') upstreamUrl.searchParams.set('order', 'asc')
     if (sorting === 'toplist') upstreamUrl.searchParams.set('topRange', '1M')
-    const seed = String(request.query.seed || '').trim()
+    const seed = String(params.seed || '').trim()
     if (/^[a-zA-Z0-9]{6}$/.test(seed)) upstreamUrl.searchParams.set('seed', seed)
     if (query) upstreamUrl.searchParams.set('q', query)
   }
@@ -60,7 +65,19 @@ export default async function handler(request, response) {
       })
     }
 
-    const data = await upstream.json()
+    let data
+    try {
+      data = await upstream.json()
+    } catch {
+      response.setHeader('Cache-Control', 'no-store')
+      return response.status(502).json({ error: 'Wallhaven returned an unreadable response. Please try again shortly.' })
+    }
+
+    if ((!id && !Array.isArray(data?.data)) || (id && (!data?.data || typeof data.data !== 'object'))) {
+      response.setHeader('Cache-Control', 'no-store')
+      return response.status(502).json({ error: 'Wallhaven returned an unexpected response. Please try again shortly.' })
+    }
+
     if (id && data.data?.purity !== 'sfw') {
       response.setHeader('Cache-Control', 'no-store')
       return response.status(404).json({ error: 'Wallpaper not found in the SFW collection.' })
@@ -68,7 +85,7 @@ export default async function handler(request, response) {
 
     const cacheControl = id
       ? 'public, s-maxage=21600, stale-while-revalidate=86400'
-      : request.query.sorting === 'random'
+      : params.sorting === 'random'
         ? 'no-store'
         : 'public, s-maxage=180, stale-while-revalidate=600'
     response.setHeader('Cache-Control', cacheControl)
@@ -76,6 +93,7 @@ export default async function handler(request, response) {
   } catch (error) {
     response.setHeader('Cache-Control', 'no-store')
     const timedOut = error?.name === 'TimeoutError' || error?.name === 'AbortError'
+    console.error('Wallhaven API proxy request failed.', { timedOut, errorName: error?.name || 'UnknownError' })
     return response.status(timedOut ? 504 : 502).json({
       error: timedOut
         ? 'Wallhaven did not respond within 10 seconds. Please try again shortly.'

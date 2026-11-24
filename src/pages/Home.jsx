@@ -83,7 +83,7 @@ function HeroCollage({ wallpapers, loading }) {
 }
 
 export default function Home() {
-  const { wallpapers, loading, loadingMore, error, loadMoreError, hasMore, loadMore, totalCount } = useWallpapers({ sort: 'random' })
+  const { wallpapers, loading, loadingMore, error, loadMoreError, hasMore, loadMore, retry, totalCount } = useWallpapers({ sort: 'random' })
 
   return (
     <div>
@@ -144,7 +144,7 @@ export default function Home() {
           {totalCount != null && <span className="text-label text-ink-soft">{totalCount.toLocaleString()} to explore</span>}
         </div>
         {loading && <WallpaperGridSkeleton count={8} />}
-        {error && wallpapers.length === 0 && <ErrorState error={error} />}
+        {error && wallpapers.length === 0 && <ErrorState error={error} onRetry={retry} />}
         {!loading && wallpapers.length > 0 && <WallpaperGrid wallpapers={wallpapers} columns={4} />}
         {loadingMore && <div className="mt-xl"><WallpaperGridSkeleton count={4} /></div>}
         {loadMoreError && <p role="alert" className="mt-lg text-center text-body-sm text-ink-soft">{loadMoreError.message}</p>}

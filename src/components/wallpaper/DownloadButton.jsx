@@ -1,5 +1,5 @@
-import { Download } from "lucide-react";
-import { useToast } from "../common/ToastContext.jsx";
+import { Download } from 'lucide-react'
+import { useToast } from '../common/ToastContext.jsx'
 
 /**
  * Triggers a real "Save As" download, not just opening the image in a new
@@ -10,36 +10,48 @@ import { useToast } from "../common/ToastContext.jsx";
  */
 export default function DownloadButton({
   imageUrl,
-  filename = "wallpaper.jpg",
-  variant = "icon",
+  filename = 'wallpaper.jpg',
+  variant = 'icon',
 }) {
-  const { showToast } = useToast();
+  const { showToast } = useToast()
 
   async function handleDownload(e) {
-    e.preventDefault();
-    e.stopPropagation();
+    e.preventDefault()
+    e.stopPropagation()
+
+    if (!imageUrl) {
+      showToast('This wallpaper does not have a downloadable image URL.', { type: 'error' })
+      return
+    }
 
     try {
-      const response = await fetch(imageUrl, { mode: "cors" });
-      const blob = await response.blob();
-      const objectUrl = URL.createObjectURL(blob);
+      const response = await fetch(imageUrl, { mode: 'cors' })
+      if (!response.ok) throw new Error(`Image request failed (${response.status}).`)
+      const blob = await response.blob()
+      if (!blob.size) throw new Error('The image response was empty.')
+      const objectUrl = URL.createObjectURL(blob)
 
-      const link = document.createElement("a");
-      link.href = objectUrl;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      URL.revokeObjectURL(objectUrl);
-      showToast("Wallpaper downloaded");
+      const link = document.createElement('a')
+      link.href = objectUrl
+      link.download = filename
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      window.setTimeout(() => URL.revokeObjectURL(objectUrl), 60_000)
+      showToast('Wallpaper downloaded')
     } catch {
       // Fallback if a future CDN blocks CORS — at least gets the user to the image.
-      window.open(imageUrl, "_blank", "noopener,noreferrer");
-      showToast("Opened the wallpaper in a new tab", { type: "success" });
+      const opened = window.open(imageUrl, '_blank')
+      if (opened) {
+        opened.opener = null
+        showToast('Opened the wallpaper in a new tab')
+      } else {
+        showToast('Download failed. Allow pop-ups or try again.', { type: 'error' })
+      }
     }
   }
 
-  if (variant === "primary") {
+  if (variant === 'primary') {
     return (
       <button
         type="button"
@@ -49,13 +61,12 @@ export default function DownloadButton({
         <Download size={16} strokeWidth={2} />
         Download
       </button>
-    );
+    )
   }
 
-  const iconClasses =
-    variant === "icon-static"
-      ? "bg-bg/90 hover:bg-bg text-ink rounded-sm p-sm shadow-hung transition-colors"
-      : "absolute top-sm right-sm bg-bg/90 hover:bg-bg text-ink rounded-sm p-sm shadow-hung transition-colors";
+  const iconClasses = variant === 'icon-static'
+    ? 'bg-bg/90 hover:bg-bg text-ink rounded-sm p-sm shadow-hung transition-colors'
+    : 'absolute top-sm right-sm bg-bg/90 hover:bg-bg text-ink rounded-sm p-sm shadow-hung transition-colors'
 
   return (
     <button
@@ -66,5 +77,5 @@ export default function DownloadButton({
     >
       <Download size={16} strokeWidth={2} />
     </button>
-  );
+  )
 }

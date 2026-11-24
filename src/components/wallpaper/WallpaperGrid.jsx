@@ -21,9 +21,7 @@ export function WallpaperGridSkeleton({ count = 8 }) {
           aria-hidden="true"
           className="break-inside-avoid mb-md md:mb-lg overflow-hidden rounded-md border border-line bg-surface"
         >
-          <div
-            className={`${SKELETON_SHAPES[index % SKELETON_SHAPES.length]} animate-pulse bg-line/50`}
-          />
+          <div className={`${SKELETON_SHAPES[index % SKELETON_SHAPES.length]} animate-pulse bg-line/50`} />
           <div className="space-y-sm p-sm sm:p-md lg:p-lg">
             <div className="h-3 w-3/5 animate-pulse rounded bg-line/70" />
             <div className="flex justify-between gap-sm">
