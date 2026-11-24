@@ -1,15 +1,15 @@
-import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
-  Menu,
-  X,
   Compass,
-  Users,
   Heart,
   Image,
-  UserCircle,
   LogOut,
+  Menu,
+  UserCircle,
+  Users,
+  X,
 } from "lucide-react";
+import { useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.png";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useToast } from "./ToastContext.jsx";
@@ -62,7 +62,6 @@ export default function Navbar() {
           },
         ]
       : []),
-
   ];
 
   return (

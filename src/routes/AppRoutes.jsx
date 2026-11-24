@@ -1,29 +1,29 @@
-import { Navigate, Route, Routes } from 'react-router-dom'
-import AdminRoute from '../components/auth/AdminRoute.jsx'
-import ProtectedRoute from '../components/auth/ProtectedRoute.jsx'
-import AdminLayout from '../components/admin/AdminLayout.jsx'
-import AccountSettings from '../pages/AccountSettings.jsx'
-import Category from '../pages/Category.jsx'
-import CollectionDetail from '../pages/CollectionDetail.jsx'
-import Collections from '../pages/Collections.jsx'
-import Creators from '../pages/Creators.jsx'
-import Creator from '../pages/Creator.jsx'
-import Explore from '../pages/Explore.jsx'
-import Favorites from '../pages/Favorites.jsx'
-import ForgotPassword from '../pages/ForgotPassword.jsx'
-import Home from '../pages/Home.jsx'
-import Login from '../pages/Login.jsx'
-import MyUploads from '../pages/MyUploads.jsx'
-import Profile from '../pages/Profile.jsx'
-import Signup from '../pages/Signup.jsx'
-import UpdatePassword from '../pages/UpdatePassword.jsx'
-import Upload from '../pages/Upload.jsx'
-import WallpaperDetail from '../pages/WallpaperDetail.jsx'
-import AdminCategories from '../pages/admin/Categories.jsx'
-import AdminDashboard from '../pages/admin/Dashboard.jsx'
-import AdminModeration from '../pages/admin/Moderation.jsx'
-import AdminUsers from '../pages/admin/Users.jsx'
-import AdminWallpapers from '../pages/admin/Wallpapers.jsx'
+import { Navigate, Route, Routes } from "react-router-dom";
+import AdminLayout from "../components/admin/AdminLayout.jsx";
+import AdminRoute from "../components/auth/AdminRoute.jsx";
+import ProtectedRoute from "../components/auth/ProtectedRoute.jsx";
+import AccountSettings from "../pages/AccountSettings.jsx";
+import Category from "../pages/Category.jsx";
+import CollectionDetail from "../pages/CollectionDetail.jsx";
+import Collections from "../pages/Collections.jsx";
+import Creator from "../pages/Creator.jsx";
+import Creators from "../pages/Creators.jsx";
+import Explore from "../pages/Explore.jsx";
+import Favorites from "../pages/Favorites.jsx";
+import ForgotPassword from "../pages/ForgotPassword.jsx";
+import Home from "../pages/Home.jsx";
+import Login from "../pages/Login.jsx";
+import MyUploads from "../pages/MyUploads.jsx";
+import Profile from "../pages/Profile.jsx";
+import Signup from "../pages/Signup.jsx";
+import UpdatePassword from "../pages/UpdatePassword.jsx";
+import Upload from "../pages/Upload.jsx";
+import WallpaperDetail from "../pages/WallpaperDetail.jsx";
+import AdminCategories from "../pages/admin/Categories.jsx";
+import AdminDashboard from "../pages/admin/Dashboard.jsx";
+import AdminModeration from "../pages/admin/Moderation.jsx";
+import AdminUsers from "../pages/admin/Users.jsx";
+import AdminWallpapers from "../pages/admin/Wallpapers.jsx";
 
 export default function AppRoutes() {
   return (
@@ -66,7 +66,10 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       />
-      <Route path="/account/settings" element={<Navigate to="/account/edit-profile" replace />} />
+      <Route
+        path="/account/settings"
+        element={<Navigate to="/account/edit-profile" replace />}
+      />
 
       <Route
         path="/account/uploads"
@@ -144,5 +147,5 @@ export default function AppRoutes() {
         }
       />
     </Routes>
-  )
+  );
 }

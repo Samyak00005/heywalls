@@ -1,64 +1,72 @@
-import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { LoadingState } from '../components/common/DataState.jsx'
-import AccountSidebar from '../components/common/AccountSidebar.jsx'
-import LibraryFilters, { applyLibraryFilters, DEFAULT_LIBRARY_FILTERS } from '../components/wallpaper/LibraryFilters.jsx'
-import { useCategories } from '../hooks/useCategories.js'
-import { useAuth } from '../context/AuthContext.jsx'
-import { supabase } from '../lib/supabaseClient.js'
-import { mapWallpaperRow, WALLPAPER_SELECT } from '../lib/wallpaperMapper.js'
-import OptimizedImage from '../components/wallpaper/OptimizedImage.jsx'
-import { getOrientationAspectClass, getOrientationLabel, getOrientationWidth } from '../lib/orientation.js'
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import AccountSidebar from "../components/common/AccountSidebar.jsx";
+import { LoadingState } from "../components/common/DataState.jsx";
+import LibraryFilters, {
+  applyLibraryFilters,
+  DEFAULT_LIBRARY_FILTERS,
+} from "../components/wallpaper/LibraryFilters.jsx";
+import OptimizedImage from "../components/wallpaper/OptimizedImage.jsx";
+import { useAuth } from "../context/AuthContext.jsx";
+import { useCategories } from "../hooks/useCategories.js";
+import {
+  getOrientationAspectClass,
+  getOrientationLabel,
+  getOrientationWidth,
+} from "../lib/orientation.js";
+import { supabase } from "../lib/supabaseClient.js";
+import { mapWallpaperRow, WALLPAPER_SELECT } from "../lib/wallpaperMapper.js";
 
 const STATUS_LABEL = {
-  pending: 'Pending review',
-  approved: 'Live',
-  rejected: 'Not approved',
-}
+  pending: "Pending review",
+  approved: "Live",
+  rejected: "Not approved",
+};
 
 export default function MyUploads() {
-  const { user, profile } = useAuth()
-  const [uploads, setUploads] = useState(null)
-  const [error, setError] = useState(null)
-  const [filters, setFilters] = useState(DEFAULT_LIBRARY_FILTERS)
-  const [status, setStatus] = useState('all')
-  const { categories } = useCategories()
+  const { user, profile } = useAuth();
+  const [uploads, setUploads] = useState(null);
+  const [error, setError] = useState(null);
+  const [filters, setFilters] = useState(DEFAULT_LIBRARY_FILTERS);
+  const [status, setStatus] = useState("all");
+  const { categories } = useCategories();
 
   useEffect(() => {
-    let active = true
-    if (!user) return undefined
+    let active = true;
+    if (!user) return undefined;
 
     async function loadUploads() {
       const { data, error: queryError } = await supabase
-        .from('wallpapers')
-        .select(WALLPAPER_SELECT + ', status')
-        .eq('uploader_id', user.id)
-        .order('created_at', { ascending: false })
+        .from("wallpapers")
+        .select(WALLPAPER_SELECT + ", status")
+        .eq("uploader_id", user.id)
+        .order("created_at", { ascending: false });
 
-      if (!active) return
+      if (!active) return;
       if (queryError) {
-        setError(queryError)
-        setUploads([])
+        setError(queryError);
+        setUploads([]);
       } else {
-        setUploads((data || []).map(mapWallpaperRow))
+        setUploads((data || []).map(mapWallpaperRow));
       }
     }
 
+    loadUploads();
+    return () => {
+      active = false;
+    };
+  }, [user]);
 
-    loadUploads()
-    return () => { active = false }
-  }, [user])
-
-
-  const filteredUploads = applyLibraryFilters(uploads || [], filters)
-    .filter((w) => status === 'all' || w.status === status)
+  const filteredUploads = applyLibraryFilters(uploads || [], filters).filter(
+    (w) => status === "all" || w.status === status,
+  );
 
   if (!uploads) {
     return (
       <div className="container-page pt-xl pb-3xl">
         <LoadingState label="Loading your HeyWalls space…" />
       </div>
-    )
+    );
   }
 
   return (
@@ -71,9 +79,14 @@ export default function MyUploads() {
               <p className="text-body-sm text-ink-soft">
                 Your wallpapers, review status, and published work.
               </p>
-              <p className="text-label text-ink-soft mt-sm">{filteredUploads.length} shown · {uploads.length} total</p>
+              <p className="text-label text-ink-soft mt-sm">
+                {filteredUploads.length} shown · {uploads.length} total
+              </p>
             </div>
-            <Link to="/upload" className="bg-accent text-accent-contrast rounded-md px-lg py-sm text-body-sm font-medium">
+            <Link
+              to="/upload"
+              className="bg-accent text-accent-contrast rounded-md px-lg py-sm text-body-sm font-medium"
+            >
               Upload wallpaper
             </Link>
           </div>
@@ -93,14 +106,18 @@ export default function MyUploads() {
 
           {uploads.length === 0 ? (
             <div className="border border-line bg-surface rounded-md p-2xl text-center">
-              <p className="text-body-sm text-ink-soft mb-lg">No uploads yet.</p>
+              <p className="text-body-sm text-ink-soft mb-lg">
+                No uploads yet.
+              </p>
               <Link to="/upload" className="text-ink underline">
                 Upload your first wallpaper
               </Link>
             </div>
           ) : filteredUploads.length === 0 ? (
             <div className="border border-line bg-surface rounded-md p-xl text-center">
-              <p className="text-body-sm text-ink-soft">No uploads match these filters.</p>
+              <p className="text-body-sm text-ink-soft">
+                No uploads match these filters.
+              </p>
             </div>
           ) : (
             <div className="grid grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-md lg:gap-lg items-start">
@@ -109,14 +126,12 @@ export default function MyUploads() {
               ))}
             </div>
           )}
-
         </section>
 
         <AccountSidebar username={profile?.username} variant="wallpapers" />
-
       </div>
     </div>
-  )
+  );
 }
 
 function UploadStatus({ status }) {
@@ -124,7 +139,7 @@ function UploadStatus({ status }) {
     <span className="absolute top-sm left-sm bg-bg/90 border border-line rounded-sm px-sm py-xs text-label">
       {STATUS_LABEL[status] || status}
     </span>
-  )
+  );
 }
 
 function UploadMeta({ wallpaper }) {
@@ -133,10 +148,10 @@ function UploadMeta({ wallpaper }) {
       <p className="upload-card-title">{wallpaper.title}</p>
       <div className="upload-card-subline">
         <span>{getOrientationLabel(wallpaper.orientation)}</span>
-        <span>{wallpaper.category || 'Uncategorized'}</span>
+        <span>{wallpaper.category || "Uncategorized"}</span>
       </div>
     </div>
-  )
+  );
 }
 
 function UploadCard({ wallpaper }) {
@@ -145,7 +160,9 @@ function UploadCard({ wallpaper }) {
       to={`/wallpaper/${wallpaper.id}`}
       className="group self-start bg-surface border border-line rounded-md overflow-hidden block"
     >
-      <div className={`relative ${getOrientationAspectClass(wallpaper.orientation)}`}>
+      <div
+        className={`relative ${getOrientationAspectClass(wallpaper.orientation)}`}
+      >
         <OptimizedImage
           src={wallpaper.imageUrl}
           alt={wallpaper.title}
@@ -156,5 +173,5 @@ function UploadCard({ wallpaper }) {
       </div>
       <UploadMeta wallpaper={wallpaper} />
     </Link>
-  )
+  );
 }

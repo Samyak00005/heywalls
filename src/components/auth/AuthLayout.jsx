@@ -8,5 +8,5 @@ export default function AuthLayout({ children }) {
     <div className="min-h-[70vh] flex items-center justify-center px-lg">
       <div className="w-full max-w-[360px]">{children}</div>
     </div>
-  )
+  );
 }

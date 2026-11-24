@@ -9,13 +9,13 @@ export default function SwatchTag({ label, active = false, onClick }) {
       type="button"
       onClick={onClick}
       className={
-        'inline-flex items-center border rounded-md px-lg py-sm text-body-sm transition-colors ' +
+        "inline-flex items-center border rounded-md px-lg py-sm text-body-sm transition-colors " +
         (active
-          ? 'bg-accent text-accent-contrast border-accent'
-          : 'bg-surface text-ink border-line hover:border-ink-soft')
+          ? "bg-accent text-accent-contrast border-accent"
+          : "bg-surface text-ink border-line hover:border-ink-soft")
       }
     >
       {label}
     </button>
-  )
+  );
 }

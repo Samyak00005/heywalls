@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabaseClient.js'
-import { mapWallpaperRow, WALLPAPER_SELECT } from '../lib/wallpaperMapper.js'
 import { readWallpaperCache, writeWallpaperCache } from '../lib/wallpaperCache.js'
+import { mapWallpaperRow, WALLPAPER_SELECT } from '../lib/wallpaperMapper.js'
 
 const CACHE_KEY = 'approved-batch'
 const CACHE_MAX_AGE = 10 * 60 * 1000

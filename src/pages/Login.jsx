@@ -1,14 +1,16 @@
-import { useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
-import AuthForm from '../components/auth/AuthForm.jsx'
-import AuthLayout from '../components/auth/AuthLayout.jsx'
-import { useToast } from '../components/common/ToastContext.jsx'
+import { useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import AuthForm from "../components/auth/AuthForm.jsx";
+import AuthLayout from "../components/auth/AuthLayout.jsx";
+import { useToast } from "../components/common/ToastContext.jsx";
 
 export default function Login() {
-  const navigate = useNavigate()
-  const location = useLocation()
-  const { showToast } = useToast()
-  const [notice] = useState(location.state?.prefillEmail ? 'Sign in below to continue.' : null)
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { showToast } = useToast();
+  const [notice] = useState(
+    location.state?.prefillEmail ? "Sign in below to continue." : null,
+  );
 
   return (
     <AuthLayout>
@@ -18,8 +20,8 @@ export default function Login() {
         mode="login"
         prefillEmail={location.state?.prefillEmail}
         onSuccess={() => {
-          showToast('Welcome back to HeyWalls.')
-          navigate('/')
+          showToast("Welcome back to HeyWalls.");
+          navigate("/");
         }}
       />
       <div className="flex flex-col gap-xs mt-lg text-body-sm text-ink-soft">
@@ -27,12 +29,12 @@ export default function Login() {
           Forgot your password?
         </Link>
         <span>
-          New here?{' '}
+          New here?{" "}
           <Link to="/signup" className="text-ink underline">
             Create an account
           </Link>
         </span>
       </div>
     </AuthLayout>
-  )
+  );
 }
