@@ -3,7 +3,7 @@ import logo from "../../assets/logo.png";
 
 export default function Footer() {
   return (
-    <footer className="border-t border-line bg-bg">
+    <footer className="border-t border-line bg-surface">
       <div className="container-page py-2xl md:py-3xl">
         <div className="grid gap-2xl md:grid-cols-[minmax(0,1.5fr)_repeat(2,minmax(0,1fr))]">
           <div>
@@ -14,48 +14,58 @@ export default function Footer() {
               </span>
             </Link>
             <p className="mt-md max-w-[420px] text-body-sm text-ink-soft">
-              Walls worth living with. A simple home for desktop, tablet, and
-              phone wallpapers, curated by us and shared by the community.
+              A personal home for wallpapers worth living with. Save favorites
+              in this browser and return to them anytime.
             </p>
           </div>
 
           <div>
             <p className="text-label uppercase tracking-[0.08em] text-ink-soft mb-md">
-              Explore
+              Browse
             </p>
             <nav className="flex flex-col gap-sm text-body-sm">
               <Link to="/explore" className="hover:text-ink">
-                Browse wallpapers
+                Explore wallpapers
+              </Link>
+              <Link to="/categories" className="hover:text-ink">
+                All categories
               </Link>
               <Link to="/category/nature" className="hover:text-ink">
-                Browse by mood
+                Nature
               </Link>
-              <Link to="/creators" className="hover:text-ink">
-                Creators
+              <Link to="/category/anime" className="hover:text-ink">
+                Anime
               </Link>
             </nav>
           </div>
 
           <div>
             <p className="text-label uppercase tracking-[0.08em] text-ink-soft mb-md">
-              Your space
+              Your library
             </p>
             <nav className="flex flex-col gap-sm text-body-sm">
-              <Link to="/upload" className="hover:text-ink">
-                Upload a wallpaper
+              <Link to="/saved" className="hover:text-ink">
+                Saved wallpapers
               </Link>
-              <Link to="/account/uploads" className="hover:text-ink">
-                My wallpapers
+              <Link to="/about" className="hover:text-ink">
+                About HeyWalls
               </Link>
-              <Link to="/collections" className="hover:text-ink">
-                Collections
-              </Link>
+              <a
+                href="https://wallhaven.cc"
+                target="_blank"
+                rel="noreferrer"
+                className="hover:text-ink"
+              >
+                Wallpaper source: Wallhaven
+              </a>
             </nav>
           </div>
         </div>
 
         <div className="mt-2xl flex flex-col gap-sm border-t border-line pt-lg text-label text-ink-soft sm:flex-row sm:items-center sm:justify-between">
-          <span>Desktop &amp; phone · 9:16 and 16:9</span>
+          <span>
+            Images and wallpaper pages link to their original Wallhaven sources.
+          </span>
           <span>© {new Date().getFullYear()} HeyWalls</span>
         </div>
       </div>

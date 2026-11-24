@@ -1,22 +1,14 @@
 import { Heart } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext.jsx";
 import { useFavorites } from "../../hooks/useFavorites.js";
 
-export default function FavoriteButton({ wallpaperId, variant = "icon" }) {
-  const { user } = useAuth();
-  const navigate = useNavigate();
+export default function FavoriteButton({ wallpaper, variant = "icon" }) {
   const { isFavorite, toggle } = useFavorites();
-  const active = isFavorite(wallpaperId);
+  const active = isFavorite(wallpaper?.id);
 
   function handleClick(e) {
     e.preventDefault();
     e.stopPropagation();
-    if (!user) {
-      navigate("/login");
-      return;
-    }
-    toggle(wallpaperId);
+    toggle(wallpaper);
   }
 
   if (variant === "primary") {

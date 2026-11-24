@@ -1,34 +1,51 @@
-/**
- * Flattens a Supabase wallpapers row (with joined wallpaper_categories →
- * categories) into the flat shape WallpaperCard/WallpaperGrid expect.
- * A wallpaper can have multiple categories; the first is used as the
- * card's display label, matching the single-label design.
- */
-export function mapWallpaperRow(row) {
-  const joined = row.wallpaper_categories ?? []
-  const categoryNames = joined.map((wc) => wc.categories?.name).filter(Boolean)
-  const categorySlugs = joined.map((wc) => wc.categories?.slug).filter(Boolean)
-
-  return {
-    id: row.id,
-    title: row.title,
-    description: row.description,
-    imageUrl: row.thumbnail_url || row.image_url,
-    fullImageUrl: row.image_url,
-    orientation: row.orientation,
-    width: row.width || null,
-    height: row.height || null,
-    resolution: row.width && row.height ? `${row.width} × ${row.height}` : null,
-    category: categoryNames[0] || 'Uncategorized',
-    categorySlugs,
-    categoryIds: joined.map((wc) => wc.category_id).filter(Boolean),
-    uploader: row.profiles?.username || null,
-    uploaderDisplayName: row.profiles?.display_name || null,
-    downloadCount: row.download_count,
-    createdAt: row.created_at,
-    status: row.status,
-  }
+function getOrientation(width, height) {
+  const ratio = width && height ? width / height : 1
+  if (ratio < 0.82) return 'phone'
+  if (ratio > 1.2) return 'desktop'
+  return 'tablet'
 }
 
-export const WALLPAPER_SELECT =
-  'id, title, description, image_url, thumbnail_url, orientation, width, height, download_count, created_at, profiles(username, display_name), wallpaper_categories(category_id, categories(name, slug))'
+function formatCategory(value) {
+  if (!value) return 'Wallpaper'
+  return value.replace(/[_-]+/g, ' ').replace(/\b\w/g, (letter) => letter.toUpperCase())
+}
+
+export function mapWallhavenWallpaper(row) {
+  const width = Number(row.dimension_x) || null
+  const height = Number(row.dimension_y) || null
+  const tags = (row.tags || []).map((tag) => tag.name).filter(Boolean)
+  const rawCategory = String(row.category || '').trim()
+  const category = formatCategory(rawCategory || tags[0])
+  const resolution = row.resolution || (width && height ? `${width} × ${height}` : null)
+  const imageCandidates = [row.thumbs?.original, row.thumbs?.large, row.thumbs?.small, row.path].filter(Boolean)
+  const imageUrl = imageCandidates[0] || ''
+  const titleSource = typeof row.source === 'string' && !/^https?:\/\//i.test(row.source.trim())
+    ? row.source.trim()
+    : ''
+  const title = tags.length
+    ? tags.slice(0, 2).join(' · ')
+    : titleSource || `Wallpaper ${String(row.id || '').toUpperCase()}`
+
+  return {
+    id: `wallhaven-${row.id}`,
+    title,
+    description: tags.slice(0, 6).join(' · '),
+    // The large thumbnail is center-cropped. Prefer Wallhaven's original-ratio
+    // thumbnail so portrait previews keep their full composition.
+    imageUrl,
+    imageFallbackUrls: imageCandidates.filter((url) => url !== imageUrl),
+    fullImageUrl: row.path || row.thumbs?.original || row.thumbs?.large || row.thumbs?.small,
+    orientation: getOrientation(width, height),
+    width,
+    height,
+    resolution,
+    category,
+    apiCategory: rawCategory.toLowerCase(),
+    tags,
+    uploader: row.uploader?.username || null,
+    createdAt: row.created_at || null,
+    views: row.views || 0,
+    source: 'Wallhaven',
+    sourceUrl: row.url || `https://wallhaven.cc/w/${row.id}`,
+  }
+}

@@ -31,6 +31,6 @@ export function writeWallpaperCache(key, value) {
     localStorage.setItem(storageKey(key), JSON.stringify(payload))
   } catch {
     // Caching is an enhancement. A full/disabled localStorage must never
-    // prevent wallpapers from loading from Supabase.
+    // prevent wallpapers from loading from the API.
   }
 }

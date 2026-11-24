@@ -1,20 +1,50 @@
-export function LoadingState({ label = "Loading wallpapers…" }) {
+export function WallpaperDetailSkeleton() {
   return (
-    <p className="text-body-sm text-ink-soft py-2xl text-center">{label}</p>
+    <div
+      className="container-page animate-pulse pt-xl pb-3xl md:pb-4xl"
+      role="status"
+      aria-label="Loading wallpaper details"
+      aria-busy="true"
+    >
+      <div className="mb-lg h-3 w-32 rounded bg-line/60" />
+      <div className="grid items-start gap-2xl lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-4xl">
+        <div className="aspect-[4/3] min-h-[280px] rounded-md bg-surface lg:aspect-auto lg:h-[68vh]" />
+        <div className="space-y-lg">
+          <div className="h-8 w-4/5 rounded bg-line/60" />
+          <div className="h-3 w-full rounded bg-line/50" />
+          <div className="h-3 w-2/3 rounded bg-line/50" />
+          <div className="mt-xl space-y-sm border-t border-line pt-lg">
+            <div className="h-3 w-1/2 rounded bg-line/50" />
+            <div className="h-3 w-2/3 rounded bg-line/50" />
+            <div className="h-3 w-1/3 rounded bg-line/50" />
+          </div>
+          <span className="sr-only">Loading wallpaper details…</span>
+        </div>
+      </div>
+    </div>
   );
 }
 
-export function ErrorState({ error }) {
+export function ErrorState({ error, onRetry }) {
   return (
     <div className="border border-line rounded-md p-xl text-center">
-      <p className="text-body text-ink mb-sm">Couldn't load wallpapers.</p>
+      <p className="text-body text-ink mb-sm">
+        The wallpaper feed is unavailable right now.
+      </p>
       <p className="text-body-sm text-ink-soft max-w-[420px] mx-auto">
-        This usually means Supabase isn't configured yet — check that{" "}
-        <code>.env</code> has your project URL and anon key, and that the
-        migration + seed SQL have been run. See the README for setup steps.
+        Check your connection or try again in a moment.
       </p>
       {error?.message && (
         <p className="text-label text-ink-soft mt-sm">({error.message})</p>
+      )}
+      {onRetry && (
+        <button
+          type="button"
+          onClick={onRetry}
+          className="mt-lg rounded-md border border-line bg-surface px-lg py-sm text-body-sm text-ink hover:border-ink-soft"
+        >
+          Try again
+        </button>
       )}
     </div>
   );

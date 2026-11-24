@@ -1,191 +1,213 @@
-import {
-  Compass,
-  Heart,
-  Image,
-  LogOut,
-  Menu,
-  UserCircle,
-  Users,
-  X,
-} from "lucide-react";
-import { useState } from "react";
+import { Compass, Heart, Menu, Search, Sparkles, X } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.png";
-import { useAuth } from "../../context/AuthContext.jsx";
-import { useToast } from "./ToastContext.jsx";
+import { FEATURED_TOPICS, WALLPAPER_TOPICS } from "../../lib/categories.js";
+
+function ExploreLink({ onClick, active = false }) {
+  return (
+    <Link
+      to="/explore"
+      onClick={onClick}
+      className={`inline-flex items-center gap-xs whitespace-nowrap text-body-sm transition-colors hover:text-ink ${active ? "font-medium text-ink" : "text-ink-soft"}`}
+    >
+      <Compass size={16} strokeWidth={1.8} aria-hidden="true" />
+      <span>Explore</span>
+    </Link>
+  );
+}
+
+function SavedLink({ onClick, className = "", compact = false }) {
+  return (
+    <Link
+      to="/saved"
+      onClick={onClick}
+      className={`inline-flex items-center gap-xs whitespace-nowrap text-body-sm text-ink-soft transition-colors hover:text-ink ${className}`}
+    >
+      <Heart size={16} strokeWidth={1.8} aria-hidden="true" />
+      <span className={compact ? "hidden md:inline" : ""}>Saved</span>
+    </Link>
+  );
+}
 
 export default function Navbar() {
-  const { user, profile, signOut } = useAuth();
-  const { showToast } = useToast();
-  const navigate = useNavigate();
   const location = useLocation();
+  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState(() => {
+    const params = new URLSearchParams(location.search);
+    return location.pathname === "/explore" ? params.get("q") || "" : "";
+  });
+  const [searchFocused, setSearchFocused] = useState(false);
+  const closeMenu = () => setMenuOpen(false);
+  const exploreActive = location.pathname === "/explore";
 
-  async function handleSignOut() {
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    setSearchQuery(
+      location.pathname === "/explore" ? params.get("q") || "" : "",
+    );
+  }, [location.pathname, location.search]);
+
+  function runSearch(value) {
+    const query = value.trim();
+    if (!query) return;
+    navigate(`/explore?q=${encodeURIComponent(query)}`);
+    setMobileSearchOpen(false);
     setMenuOpen(false);
-    const { error } = await signOut();
-    if (error) return;
-    showToast("You’ve been signed out.");
-    navigate("/");
+    setSearchFocused(false);
   }
 
-  const closeMenu = () => setMenuOpen(false);
+  function submitSearch(event) {
+    event.preventDefault();
+    runSearch(searchQuery);
+  }
 
-  const isActive = (path) =>
-    path === "/explore"
-      ? location.pathname === "/explore"
-      : location.pathname === path || location.pathname.startsWith(`${path}/`);
+  function renderSearchForm(mobile = false) {
+    const normalizedQuery = searchQuery.trim().toLowerCase();
+    const suggestions = normalizedQuery
+      ? WALLPAPER_TOPICS.filter(({ name, query }) =>
+          `${name} ${query}`.toLowerCase().includes(normalizedQuery),
+        ).slice(0, 5)
+      : FEATURED_TOPICS.slice(0, 5);
 
-  const links = [
-    {
-      to: "/explore",
-      label: "Explore",
-      icon: Compass,
-    },
-    {
-      to: "/creators",
-      label: "Creators",
-      icon: Users,
-    },
-
-    ...(user
-      ? [
-          {
-            to: "/account/favorites",
-            label: "Favourites",
-            icon: Heart,
-          },
-          {
-            to: "/account/uploads",
-            label: "My wallpapers",
-            icon: Image,
-          },
-        ]
-      : []),
-  ];
+    return (
+      <form
+        onSubmit={submitSearch}
+        onFocus={() => setSearchFocused(true)}
+        onBlur={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget))
+            setSearchFocused(false);
+        }}
+        className={`relative ${mobile ? "w-full" : "hidden w-56 shrink-0 xl:block"}`}
+        role="search"
+      >
+        <Search
+          size={16}
+          strokeWidth={1.8}
+          aria-hidden="true"
+          className="pointer-events-none absolute left-md top-1/2 -translate-y-1/2 text-ink-soft"
+        />
+        <input
+          type="search"
+          value={searchQuery}
+          onChange={(event) => setSearchQuery(event.target.value)}
+          placeholder="Search wallpapers…"
+          aria-label="Search wallpapers"
+          aria-autocomplete="list"
+          aria-expanded={searchFocused}
+          autoFocus={mobile}
+          className="global-search-input w-full rounded-md border border-line bg-bg py-sm pl-2xl pr-md text-body-sm text-ink placeholder:text-ink-soft focus:bg-accent-contrast focus:outline-none"
+        />
+        {searchFocused && (
+          <div
+            className="absolute left-0 right-0 top-[calc(100%+8px)] z-[60] overflow-hidden rounded-md border border-line bg-accent-contrast shadow-hung"
+            role="listbox"
+            aria-label="Search suggestions"
+          >
+            {suggestions.map(({ slug, name, query }) => (
+              <button
+                key={slug}
+                type="button"
+                role="option"
+                aria-selected="false"
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => runSearch(query)}
+                className="flex w-full items-center gap-sm border-b border-line px-md py-sm text-left text-body-sm text-ink-soft hover:bg-surface hover:text-ink"
+              >
+                <Search size={14} strokeWidth={1.8} aria-hidden="true" />
+                <span>{name}</span>
+              </button>
+            ))}
+            {searchQuery.trim() && (
+              <button
+                type="submit"
+                role="option"
+                aria-selected="false"
+                onMouseDown={(event) => event.preventDefault()}
+                className="flex w-full items-center gap-sm px-md py-sm text-left text-body-sm text-ink hover:bg-surface"
+              >
+                <Search size={14} strokeWidth={1.8} aria-hidden="true" />
+                <span>Search for “{searchQuery.trim()}”</span>
+              </button>
+            )}
+          </div>
+        )}
+      </form>
+    );
+  }
 
   return (
-    <header className="relative z-50 border-b border-line bg-bg">
-      {/* =========================
-          MAIN HEADER
-      ========================== */}
-      <div className="container-page flex items-center justify-between py-sm md:py-lg">
-        {/* Logo */}
+    <header className="relative z-50 border-b border-line bg-surface">
+      <div className="container-page flex items-center justify-between gap-md py-sm md:py-lg">
         <Link
           to="/"
-          onClick={closeMenu}
-          className="flex items-center gap-sm shrink-0"
+          onClick={() => {
+            closeMenu();
+            setMobileSearchOpen(false);
+          }}
+          className="flex shrink-0 items-center gap-sm"
         >
           <img src={logo} alt="HeyWalls" className="h-9 w-auto" />
-
           <span className="font-display italic text-h2 text-ink">HeyWalls</span>
         </Link>
 
-        {/* =========================
-            DESKTOP NAVIGATION
-        ========================== */}
-        <nav className="hidden md:flex items-center gap-xl text-body-sm text-ink-soft">
-          {links.map(({ to, label }) => (
+        <nav
+          className="hidden min-w-0 flex-1 items-center justify-center gap-sm xl:flex"
+          aria-label="Explore wallpapers by topic"
+        >
+          <ExploreLink active={exploreActive} />
+          <span className="h-5 border-l border-line" aria-hidden="true" />
+          {FEATURED_TOPICS.map(({ slug, name }) => (
             <Link
-              key={to}
-              to={to}
-              className={`
-                transition-colors
-                hover:text-ink
-                ${isActive(to) ? "text-ink font-medium" : "text-ink-soft"}
-              `}
+              key={slug}
+              to={`/category/${slug}`}
+              className="whitespace-nowrap rounded-md px-sm py-xs text-label text-ink-soft transition-colors hover:bg-bg hover:text-ink"
             >
-              {label}
+              {name}
             </Link>
           ))}
+          <Link
+            to="/categories"
+            className="whitespace-nowrap rounded-md px-sm py-xs text-label text-ink-soft transition-colors hover:bg-bg hover:text-ink"
+          >
+            Categories
+          </Link>
         </nav>
 
-        {/* =========================
-            RIGHT SIDE
-        ========================== */}
-        <div className="flex items-center gap-sm md:gap-lg">
-          {/* Username */}
-          {user && (
-            <Link
-              to={profile?.username ? `/profile/${profile.username}` : "/"}
-              className="
-                hidden sm:inline
-                text-body-sm
-                text-ink
-                hover:text-ink-soft
-                truncate
-                max-w-[150px]
-              "
-            >
-              @{profile?.username || "account"}
-            </Link>
-          )}
+        {renderSearchForm()}
 
-          {/* =========================
-              DESKTOP AUTH BUTTON
-          ========================== */}
-          <div className="hidden md:block">
-            {user ? (
-              <button
-                type="button"
-                onClick={handleSignOut}
-                className="
-                  group
-                  flex items-center gap-xs
-                  text-body-sm
-                  border border-ink
-                  text-ink
-                  rounded-md
-                  px-lg py-sm
-                  transition-all duration-200
-                  hover:bg-red-600
-                  hover:border-red-600
-                  hover:text-white
-                "
-              >
-                <span>Sign out</span>
-                <LogOut size={17} strokeWidth={1.8} />
-              </button>
+        <div className="ml-auto flex shrink-0 items-center gap-md">
+          <SavedLink compact className="rounded-md p-sm" />
+          <button
+            type="button"
+            aria-label={mobileSearchOpen ? "Close search" : "Open search"}
+            aria-expanded={mobileSearchOpen}
+            onClick={() => {
+              setMenuOpen(false);
+              setSearchFocused(false);
+              setMobileSearchOpen((open) => !open);
+            }}
+            className="flex items-center justify-center rounded-md border border-line bg-bg p-sm text-ink xl:hidden"
+          >
+            {mobileSearchOpen ? (
+              <X size={20} strokeWidth={1.8} />
             ) : (
-              <Link
-                to="/login"
-                className="
-                  text-body-sm
-                  border border-ink
-                  text-ink
-                  rounded-md
-                  px-lg py-sm
-                  transition-colors
-                  hover:bg-ink
-                  hover:text-bg
-                "
-              >
-                Sign in
-              </Link>
+              <Search size={20} strokeWidth={1.8} />
             )}
-          </div>
-
-          {/* =========================
-              MOBILE MENU BUTTON
-          ========================== */}
+          </button>
           <button
             type="button"
             aria-label={
               menuOpen ? "Close navigation menu" : "Open navigation menu"
             }
             aria-expanded={menuOpen}
-            onClick={() => setMenuOpen((open) => !open)}
-            className="
-              md:hidden
-              flex items-center justify-center
-              border border-line
-              rounded-md
-              p-sm
-              text-ink
-              bg-surface
-              transition-colors
-              hover:bg-surface/80
-            "
+            onClick={() => {
+              setMobileSearchOpen(false);
+              setMenuOpen((open) => !open);
+            }}
+            className="flex items-center justify-center rounded-md border border-line bg-bg p-sm text-ink xl:hidden"
           >
             {menuOpen ? (
               <X size={21} strokeWidth={1.8} />
@@ -196,134 +218,47 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* =========================
-          MOBILE NAVIGATION
-      ========================== */}
       {menuOpen && (
-        <div
-          className="
-            md:hidden
-            absolute
-            left-0
-            right-0
-            top-full
-            z-[100]
-            border-b
-            border-line
-            bg-bg
-            shadow-hung
-          "
+        <nav
+          className="absolute left-0 right-0 top-full border-b border-line bg-surface shadow-hung xl:hidden"
+          aria-label="Main navigation"
         >
-          <nav className="container-page py-sm flex flex-col">
-            {/* Main navigation */}
-            {links.map(({ to, label, icon: Icon }) => (
+          <div className="container-page flex flex-col py-sm">
+            <ExploreLink onClick={closeMenu} active={exploreActive} />
+            <div className="my-sm border-t border-line" />
+            {FEATURED_TOPICS.map(({ slug, name }) => (
               <Link
-                key={to}
-                to={to}
+                key={slug}
+                to={`/category/${slug}`}
                 onClick={closeMenu}
-                className={`
-                  flex items-center gap-md
-                  px-sm py-md
-                  border-b border-line
-                  text-body-sm
-                  transition-colors
-                  hover:text-ink
-                  hover:bg-surface
-                  ${isActive(to) ? "text-ink font-medium" : "text-ink-soft"}
-                `}
+                className="flex items-center gap-md border-b border-line px-sm py-md text-body-sm text-ink-soft hover:text-ink"
               >
-                <Icon size={18} strokeWidth={1.8} className="shrink-0" />
-
-                <span>{label}</span>
+                <Sparkles size={17} strokeWidth={1.8} aria-hidden="true" />
+                <span>{name}</span>
               </Link>
             ))}
+            <Link
+              to="/categories"
+              onClick={closeMenu}
+              className="border-b border-line px-sm py-md text-body-sm text-ink-soft hover:text-ink"
+            >
+              All categories
+            </Link>
+            <Link
+              to="/about"
+              onClick={closeMenu}
+              className="px-sm py-md text-body-sm text-ink-soft hover:text-ink"
+            >
+              About HeyWalls
+            </Link>
+            <SavedLink onClick={closeMenu} className="px-sm py-md" />
+          </div>
+        </nav>
+      )}
 
-            {/* =========================
-                ACCOUNT
-            ========================== */}
-            {user && (
-              <Link
-                to={profile?.username ? `/profile/${profile.username}` : "/"}
-                onClick={closeMenu}
-                className={`
-                  flex items-center gap-md
-                  px-sm py-md
-                  border-b border-line
-                  text-body-sm
-                  transition-colors
-                  hover:text-ink
-                  hover:bg-surface
-                  ${
-                    location.pathname.startsWith("/profile/")
-                      ? "text-ink font-medium"
-                      : "text-ink-soft"
-                  }
-                `}
-              >
-                <UserCircle size={18} strokeWidth={1.8} className="shrink-0" />
-
-                <span>My account</span>
-              </Link>
-            )}
-
-            {/* =========================
-                MOBILE SIGN OUT
-            ========================== */}
-            {user && (
-              <button
-                type="button"
-                onClick={handleSignOut}
-                className="
-                  group
-                  w-full
-                  flex items-center gap-md
-                  px-sm py-md
-                  mt-sm
-                  text-body-sm
-                  text-left
-                  text-ink
-                  transition-all duration-200
-
-                  hover:bg-red-600
-                  hover:border-red-600
-                  hover:text-white
-                "
-              >
-                <LogOut
-                  size={18}
-                  strokeWidth={1.8}
-                  className="
-                  shrink-0
-                  transition-colors
-                  "
-                />
-                <span>Sign out</span>
-              </button>
-            )}
-
-            {/* =========================
-                MOBILE SIGN IN
-            ========================== */}
-            {!user && (
-              <Link
-                to="/login"
-                onClick={closeMenu}
-                className="
-                  flex items-center gap-md
-                  px-sm py-md
-                  text-body-sm
-                  text-ink
-                  rounded-md
-                  transition-colors
-                  hover:bg-surface
-                "
-              >
-                <UserCircle size={18} strokeWidth={1.8} className="shrink-0" />
-
-                <span>Sign in</span>
-              </Link>
-            )}
-          </nav>
+      {mobileSearchOpen && (
+        <div className="absolute left-0 right-0 top-full z-40 border-b border-line bg-surface py-md shadow-hung xl:hidden">
+          <div className="container-page">{renderSearchForm(true)}</div>
         </div>
       )}
     </header>

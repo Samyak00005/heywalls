@@ -1,87 +1,60 @@
-import { useEffect, useState } from 'react'
-import { supabase } from '../lib/supabaseClient.js'
-import { useAuth } from './useAuth.js'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+
+const STORAGE_KEY = 'heywalls:saved-wallpapers:v1'
+const CHANGE_EVENT = 'heywalls:saved-wallpapers-changed'
+
+function readSavedWallpapers() {
+  try {
+    const value = JSON.parse(window.localStorage.getItem(STORAGE_KEY) || '[]')
+    return Array.isArray(value)
+      ? value
+        .filter((item) => item?.id && item?.imageUrl)
+        .map((item) => ({
+          ...item,
+          imageUrl: item.imageUrl.includes('th.wallhaven.cc/lg/')
+            ? item.imageUrl.replace('/lg/', '/orig/')
+            : item.imageUrl,
+        }))
+      : []
+  } catch {
+    return []
+  }
+}
+
+function saveWallpapers(items) {
+  try {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items))
+  } catch {
+    // Keep the current session usable when browser storage is unavailable.
+  }
+  window.dispatchEvent(new Event(CHANGE_EVENT))
+}
 
 export function useFavorites() {
-  const { user } = useAuth()
-  const [favoriteIds, setFavoriteIds] = useState(new Set())
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-
-  async function load() {
-    if (!user) {
-      setFavoriteIds(new Set())
-      setError(null)
-      setLoading(false)
-      return
-    }
-
-    setLoading(true)
-    setError(null)
-
-    const { data, error: queryError } = await supabase
-      .from('favorites')
-      .select('wallpaper_id')
-      .eq('user_id', user.id)
-
-    if (queryError) {
-      setError(queryError)
-      setFavoriteIds(new Set())
-    } else {
-      setFavoriteIds(new Set((data || []).map((row) => row.wallpaper_id)))
-    }
-    setLoading(false)
-  }
+  const [favorites, setFavorites] = useState(readSavedWallpapers)
 
   useEffect(() => {
-    load()
-  }, [user])
-
-  async function toggle(wallpaperId) {
-    if (!user) return false
-
-    setError(null)
-    const currentlyFavorite = favoriteIds.has(wallpaperId)
-
-    if (currentlyFavorite) {
-      const { error: deleteError } = await supabase
-        .from('favorites')
-        .delete()
-        .eq('user_id', user.id)
-        .eq('wallpaper_id', wallpaperId)
-
-      if (deleteError) {
-        setError(deleteError)
-        return true
-      }
-
-      setFavoriteIds((prev) => {
-        const next = new Set(prev)
-        next.delete(wallpaperId)
-        return next
-      })
-      return false
+    const sync = () => setFavorites(readSavedWallpapers())
+    window.addEventListener(CHANGE_EVENT, sync)
+    window.addEventListener('storage', sync)
+    return () => {
+      window.removeEventListener(CHANGE_EVENT, sync)
+      window.removeEventListener('storage', sync)
     }
+  }, [])
 
-    const { error: insertError } = await supabase
-      .from('favorites')
-      .insert({ user_id: user.id, wallpaper_id: wallpaperId })
+  const favoriteIds = useMemo(() => new Set(favorites.map((item) => item.id)), [favorites])
+  const isFavorite = useCallback((id) => favoriteIds.has(id), [favoriteIds])
 
-    if (insertError) {
-      setError(insertError)
-      return false
-    }
+  const toggle = useCallback((wallpaper) => {
+    if (!wallpaper?.id) return
+    const current = readSavedWallpapers()
+    const next = current.some((item) => item.id === wallpaper.id)
+      ? current.filter((item) => item.id !== wallpaper.id)
+      : [wallpaper, ...current]
+    saveWallpapers(next)
+    setFavorites(next)
+  }, [])
 
-    setFavoriteIds((prev) => new Set(prev).add(wallpaperId))
-    return true
-  }
-
-  return {
-    favoriteIds,
-    isFavorite: (id) => favoriteIds.has(id),
-    toggle,
-    loading,
-    error,
-    refresh: load,
-  }
+  return { favorites, favoriteIds, isFavorite, toggle }
 }

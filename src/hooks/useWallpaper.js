@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
-import { supabase } from '../lib/supabaseClient.js'
-import { mapWallpaperRow, WALLPAPER_SELECT } from '../lib/wallpaperMapper.js'
+import { mapWallhavenWallpaper } from '../lib/wallpaperMapper.js'
 
 export function useWallpaper(id) {
   const [wallpaper, setWallpaper] = useState(null)
@@ -10,33 +9,28 @@ export function useWallpaper(id) {
   useEffect(() => {
     let active = true
 
-    if (!id) {
-      setWallpaper(null)
-      setError(new Error('Wallpaper ID is missing.'))
-      setLoading(false)
-      return undefined
-    }
-
-    setLoading(true)
-    setError(null)
-    setWallpaper(null)
-
     async function load() {
-      const { data, error: queryError } = await supabase
-        .from('wallpapers')
-        .select(WALLPAPER_SELECT)
-        .eq('id', id)
-        .eq('status', 'approved')
-        .single()
-
-      if (!active) return
-
-      if (queryError) {
-        setError(queryError)
-      } else {
-        setWallpaper(mapWallpaperRow(data))
+      if (!id) {
+        setWallpaper(null)
+        setError(new Error('Wallpaper ID is missing.'))
+        setLoading(false)
+        return
       }
-      setLoading(false)
+
+      setLoading(true)
+      setError(null)
+
+      try {
+        const photoId = id.replace(/^wallhaven-/, '')
+        const response = await fetch(`/api/wallhaven?id=${encodeURIComponent(photoId)}`)
+        const result = await response.json()
+        if (!response.ok) throw new Error(result.error || 'Could not load this wallpaper.')
+        if (active) setWallpaper(mapWallhavenWallpaper(result.data))
+      } catch (loadError) {
+        if (active) setError(loadError)
+      } finally {
+        if (active) setLoading(false)
+      }
     }
 
     load()

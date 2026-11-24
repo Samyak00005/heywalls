@@ -1,73 +1,56 @@
 # HeyWalls
 
-A wallpaper site — curated + community uploads, desktop and phone.
+HeyWalls is a wallpaper discovery site powered by Wallhaven's public, SFW search API. Browsing and search use a small Vercel API proxy, while saved wallpapers live in the current browser's local storage.
 
-The current build is **HeyWalls v20.2**. See `VERSION_HISTORY.md` for the
-complete version history and a single source of truth for what has been built.
-
-## Get it running locally
+## Run locally
 
 ```bash
 npm install
-cp .env.example .env   # then fill in your Supabase project URL + anon key
 npm run dev
 ```
 
-## Where things live
+The Vite development server runs the same `/api/wallhaven` handler used on Vercel. No API key or `.env` file is required for the public SFW feed.
 
-- `src/styles/globals.css` — every design token (color, type, spacing) from
-  the design system, as CSS variables. Nothing outside this file should
-  introduce a new color, font size, or spacing value.
-- `src/lib/supabaseClient.js` — the Supabase client, reads keys from `.env`
-- `src/routes/AppRoutes.jsx` — all app routes; new pages get added here per
-  phase
-- `src/components/` — organized by domain: `common`, `wallpaper`, `upload`,
-  `auth`, `admin`, `profile`
-- `src/pages/` — one file per route, `pages/admin/` for admin-only routes
+## Features
 
-## Deploying (free tier)
+- Browse and search SFW wallpapers from Wallhaven.
+- Browse API-provided wallpaper groups and 18 curated subject searches; learn about HeyWalls.
+- Filter by portrait, landscape, or tablet-like image dimensions.
+- Sort by newest, most viewed, most favorited, monthly toplist, or random.
+- See a fresh random selection on Home and load additional wallpapers from Explore or Home; a failed next page keeps current results and can be retried.
+- Fill filtered Explore batches with up to 20 matching wallpapers when available.
+- Load wallpaper tag names from API detail records as cards enter view, and try alternate image URLs when a source image fails.
+- Cache and pace wallpaper detail lookups; show specific upstream errors and a retry action when Wallhaven is unavailable or rate-limits requests.
+- Use the universal header search with topic suggestions across routes; Explore shows the active query without a duplicate search field, and its sort control stays compact.
+- See skeleton previews while wallpaper data loads; full wallpaper detail pages use the source's original image URL.
+- Save and remove wallpapers in this browser.
+- Open each wallpaper's Wallhaven source page and download its image.
+- Read about the project and its maker, Samyak Nimsarkar.
 
-1. Push this repo to GitHub
-2. Import it in [Vercel](https://vercel.com) — it auto-detects Vite
-3. Add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` as environment
-   variables in the Vercel project settings
-4. Keep `vercel.json` in the project root. It rewrites SPA routes such as
-   `/admin/categories` to `index.html`, so direct navigation and browser
-   refreshes work correctly with React Router.
-5. Deploy — you'll get a free `.vercel.app` URL
+Saved items are browser-specific and are not synced to other browsers or devices. HeyWalls stores the wallpaper links and metadata, not copies of the image files. Wallpaper images remain hosted by Wallhaven and belong to their respective uploaders.
 
-## Supabase setup
+## Deploy to Vercel
 
-1. Create a free project at [supabase.com](https://supabase.com)
-2. Copy the project URL + anon key into `.env`
-3. In the Supabase SQL Editor, run these in order:
-   `0001_init.sql` → `0002_auth_profile_trigger.sql` →
-   `0003_profile_insert_policy.sql` → `0004_own_wallpapers_visibility.sql` →
-   `0005_phase4_and_admin.sql` → `0006_storage.sql` → `0007_admin_profile_management.sql` → `seed.sql`
-4. Run `supabase/make_admin.sql` once to make your own account an admin
-   (edit the email list in that file if needed)
-5. Deploy the delete-account Edge Function (needed for the "Delete
-   account" button in settings):
-   ```
-   npx supabase login
-   npx supabase link --project-ref <your-project-ref>
-   npx supabase functions deploy delete-account
-   ```
-   No manual secrets are needed — Supabase injects the URL/keys automatically.
-6. Restart `npm run dev` — Home and Explore should now show real data,
-   auth should work, and once you're an admin, `/admin` should load.
+1. Push the repository to GitHub and import it into Vercel.
+2. Deploy with the default Vite build settings. No provider secrets or environment variables are needed for the SFW feed.
+3. Keep both `api/wallhaven.js` and `vercel.json` in the project. The API route proxies Wallhaven requests and the rewrite serves React Router pages on refresh.
 
+The API proxy forces Wallhaven's SFW purity setting, limits request parameters, and briefly caches successful responses at Vercel's CDN.
 
-## New UI / collections features
+## Project structure
 
-Run `supabase/migrations/0008_collections.sql` after the existing migrations to enable private user collections.
+- `api/wallhaven.js` — Vercel serverless proxy for Wallhaven search and detail requests.
+- `src/hooks/useWallpapers.js` — search, sorting, pagination, and local catalog caching.
+- `src/hooks/useFavorites.js` — browser-local saved wallpaper list.
+- `src/lib/wallpaperMapper.js` — maps Wallhaven API records into HeyWalls wallpaper data.
+- `src/routes/AppRoutes.jsx` — application routes.
+- `src/components/` — shared interface and wallpaper components.
+- `src/pages/` — Home, Explore, Categories, About, Saved, Category, and wallpaper detail pages.
 
-The wallpaper detail page now shows:
-- exact 9:16 phone or 16:9 desktop presentation
-- uploaded image resolution when stored
-- related wallpapers
-- Share
-- Favorites / Saved
-- Add to Collection
+## Commands
 
-Users can access **Saved** and **Collections** from the navigation when signed in. Collections can be created from the Collections page or directly while viewing a wallpaper.
+```bash
+npm run dev
+npm run build
+npm run preview
+```

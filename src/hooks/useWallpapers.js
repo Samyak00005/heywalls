@@ -1,57 +1,37 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { supabase } from '../lib/supabaseClient.js'
 import { readWallpaperCache, writeWallpaperCache } from '../lib/wallpaperCache.js'
-import { mapWallpaperRow, WALLPAPER_SELECT } from '../lib/wallpaperMapper.js'
+import { mapWallhavenWallpaper } from '../lib/wallpaperMapper.js'
 
-const CACHE_KEY = 'approved-batch'
+const CACHE_KEY = 'wallhaven-latest-v2'
 const CACHE_MAX_AGE = 10 * 60 * 1000
-const BATCH_SIZE = 20
+const BATCH_SIZE = 24
+const FILTERED_BATCH_TARGET = 20
+const MAX_FILTER_SCAN_PAGES = 6
 
-function cleanSearch(value) {
-  return String(value || '')
-    .trim()
-    .replace(/[,%()]/g, ' ')
-    .replace(/\s+/g, ' ')
-    .slice(0, 80)
+const SORTING = {
+  newest: ['date_added', 'desc'],
+  oldest: ['date_added', 'asc'],
+  title: ['date_added', 'desc'],
+  views: ['views', 'desc'],
+  favorites: ['favorites', 'desc'],
+  toplist: ['toplist', 'desc'],
+  random: ['random', 'desc'],
 }
 
-function buildOr(parts) {
-  return parts.filter(Boolean).join(',')
+function normalizeQuery(value) {
+  return String(value || '').trim().replace(/\s+/g, ' ').slice(0, 100)
 }
 
-async function resolveSearchIds(search) {
-  if (!search) return { profileIds: [], wallpaperIds: [] }
+function matchesOrientation(wallpaper, orientation) {
+  return orientation === 'all' || orientation === 'both' || wallpaper.orientation === orientation
+}
 
-  const pattern = `%${search}%`
-  const [{ data: profiles }, { data: categories }] = await Promise.all([
-    supabase
-      .from('profiles')
-      .select('id')
-      .or(`username.ilike.${pattern},display_name.ilike.${pattern}`)
-      .limit(100),
-    supabase
-      .from('categories')
-      .select('id')
-      .ilike('name', pattern)
-      .limit(50),
-  ])
+function sortTitles(items) {
+  return [...items].sort((a, b) => a.title.localeCompare(b.title))
+}
 
-  const categoryIds = (categories || []).map((item) => item.id)
-  let wallpaperIds = []
-
-  if (categoryIds.length) {
-    const { data } = await supabase
-      .from('wallpaper_categories')
-      .select('wallpaper_id')
-      .in('category_id', categoryIds)
-      .limit(5000)
-    wallpaperIds = (data || []).map((item) => item.wallpaper_id)
-  }
-
-  return {
-    profileIds: (profiles || []).map((item) => item.id),
-    wallpaperIds,
-  }
+function createRandomSeed() {
+  return Math.random().toString(36).slice(2, 8).padEnd(6, '0')
 }
 
 export function useWallpapers(options = {}) {
@@ -60,117 +40,144 @@ export function useWallpapers(options = {}) {
     orientation = 'all',
     category = 'all',
     categorySlug = null,
+    apiCategory = '',
     sort = 'newest',
   } = options
 
-  const search = cleanSearch(query)
-  const isDefaultCatalog = !search && orientation === 'all' && category === 'all' && !categorySlug && sort === 'newest'
+  const search = normalizeQuery(query)
+  const categoryQuery = categorySlug || (category !== 'all' ? category : '')
+  const effectiveQuery = [search, categoryQuery].filter(Boolean).join(' ')
+  const isDefaultCatalog = !effectiveQuery && !apiCategory && orientation === 'all' && sort === 'newest'
   const cached = isDefaultCatalog ? readWallpaperCache(CACHE_KEY, CACHE_MAX_AGE) : null
-  const initialItems = cached?.items?.slice(0, BATCH_SIZE) || []
-  const [wallpapers, setWallpapers] = useState(initialItems)
-  const [loading, setLoading] = useState(!initialItems.length)
+  const [wallpapers, setWallpapers] = useState(cached?.items || [])
+  const [loading, setLoading] = useState(!cached?.items?.length)
   const [loadingMore, setLoadingMore] = useState(false)
   const [error, setError] = useState(null)
+  const [loadMoreError, setLoadMoreError] = useState(null)
   const [hasMore, setHasMore] = useState(cached?.hasMore ?? true)
   const [totalCount, setTotalCount] = useState(cached?.totalCount ?? null)
+  const [page, setPage] = useState(cached?.page ?? 1)
   const requestId = useRef(0)
+  const wallpapersRef = useRef(cached?.items || [])
+  const randomSeed = useRef(null)
+  if (!randomSeed.current) randomSeed.current = createRandomSeed()
 
-  const loadBatch = useCallback(async (offset, append = false) => {
+  const loadPage = useCallback(async (nextPage, append = false) => {
     const currentRequest = ++requestId.current
-    if (append) setLoadingMore(true)
-    else setLoading(true)
+    if (append) {
+      setLoadingMore(true)
+      setLoadMoreError(null)
+    }
+    else {
+      setLoading(true)
+      setLoadingMore(false)
+      setLoadMoreError(null)
+    }
     setError(null)
 
-    const categoryFilter = categorySlug || (category !== 'all' ? category : null)
-    let searchIds = { profileIds: [], wallpaperIds: [] }
-
     try {
-      if (search) searchIds = await resolveSearchIds(search)
+      const [sorting, order] = SORTING[sort] || SORTING.newest
+      const targetCount = orientation === 'all' || orientation === 'both' ? BATCH_SIZE : FILTERED_BATCH_TARGET
+      const maxPages = orientation === 'all' || orientation === 'both' ? 1 : MAX_FILTER_SCAN_PAGES
+      const existing = append ? wallpapersRef.current : []
+      const seen = new Set(existing.map((wallpaper) => wallpaper.id))
+      const mapped = []
+      let requestPage = nextPage
+      let resultMeta = null
 
-      let select = WALLPAPER_SELECT
-      if (categoryFilter) {
-        select = 'id, title, description, image_url, thumbnail_url, orientation, width, height, download_count, created_at, profiles(username, display_name), wallpaper_categories!inner(category_id, categories(name, slug))'
+      for (let index = 0; index < maxPages; index += 1) {
+        const params = new URLSearchParams({ page: String(requestPage), sorting })
+        if (order === 'asc') params.set('order', order)
+        if (effectiveQuery) params.set('q', effectiveQuery)
+        if (apiCategory) params.set('apiCategory', apiCategory)
+        if (sort === 'random') params.set('seed', randomSeed.current)
+
+        const response = await fetch(`/api/wallhaven?${params.toString()}`)
+        const responseBody = await response.text()
+        let result
+        try {
+          result = JSON.parse(responseBody)
+        } catch {
+          throw new Error('The wallpaper service returned an invalid response. Please try again shortly.')
+        }
+        if (!response.ok) throw new Error(result.error || 'Could not load wallpapers.')
+        if (currentRequest !== requestId.current) return false
+
+        resultMeta = result.meta || null
+        for (const wallpaper of (result.data || []).map(mapWallhavenWallpaper)) {
+          if (!matchesOrientation(wallpaper, orientation) || seen.has(wallpaper.id)) continue
+          seen.add(wallpaper.id)
+          mapped.push(wallpaper)
+        }
+
+        const currentApiPage = Number(resultMeta?.current_page) || requestPage
+        const lastApiPage = Number(resultMeta?.last_page) || currentApiPage
+        if (mapped.length >= targetCount || currentApiPage >= lastApiPage || index === maxPages - 1) break
+        requestPage = currentApiPage + 1
       }
 
-      let request = supabase
-        .from('wallpapers')
-        .select(select, { count: 'exact' })
-        .eq('status', 'approved')
-        .range(offset, offset + BATCH_SIZE - 1)
+      let sortedMapped = mapped
+      if (sort === 'title') sortedMapped = sortTitles(mapped)
 
-      if (orientation !== 'all') request = request.eq('orientation', orientation)
-
-      if (categoryFilter) {
-        if (categorySlug) {
-          request = request.eq('wallpaper_categories.categories.slug', categorySlug)
-        } else {
-          request = request.eq('wallpaper_categories.categories.name', categoryFilter)
-        }
-      }
-
-      if (search) {
-        const pattern = `%${search}%`
-        const parts = [`title.ilike.${pattern}`, `description.ilike.${pattern}`]
-        if (searchIds.profileIds.length) {
-          parts.push(`uploader_id.in.(${searchIds.profileIds.join(',')})`)
-        }
-        if (searchIds.wallpaperIds.length) {
-          parts.push(`id.in.(${searchIds.wallpaperIds.join(',')})`)
-        }
-        request = request.or(buildOr(parts))
-      }
-
-      if (sort === 'oldest') request = request.order('created_at', { ascending: true })
-      else if (sort === 'title') request = request.order('title', { ascending: true })
-      else if (sort === 'downloads') request = request.order('download_count', { ascending: false })
-      else request = request.order('created_at', { ascending: false })
-
-      const { data, error: queryError, count } = await request
-      if (currentRequest !== requestId.current) return false
-      if (queryError) throw queryError
-
-      const mapped = (data || []).map(mapWallpaperRow)
-      setWallpapers((current) => {
-        if (!append) return mapped
-        const existingIds = new Set(current.map((item) => item.id))
-        return [...current, ...mapped.filter((item) => !existingIds.has(item.id))]
-      })
-
-      const nextTotal = count ?? mapped.length
-      const nextHasMore = offset + mapped.length < nextTotal
-      setTotalCount(nextTotal)
-      setHasMore(nextHasMore)
-
+      const nextWallpapers = append ? [...existing, ...sortedMapped] : sortedMapped
+      wallpapersRef.current = nextWallpapers
+      setWallpapers(nextWallpapers)
+      const currentApiPage = Number(resultMeta?.current_page) || nextPage
+      const lastApiPage = Number(resultMeta?.last_page) || currentApiPage
+      setPage(currentApiPage)
+      setTotalCount(resultMeta?.total ?? sortedMapped.length)
+      setHasMore(currentApiPage < lastApiPage)
       if (isDefaultCatalog && !append) {
-        writeWallpaperCache(CACHE_KEY, { items: mapped, totalCount: nextTotal, hasMore: nextHasMore })
+        writeWallpaperCache(CACHE_KEY, {
+          items: nextWallpapers,
+          totalCount: resultMeta?.total ?? nextWallpapers.length,
+          hasMore: currentApiPage < lastApiPage,
+          page: currentApiPage,
+        })
       }
-
+      setLoadMoreError(null)
       setLoading(false)
       setLoadingMore(false)
       return true
-    } catch (queryError) {
+    } catch (loadError) {
       if (currentRequest !== requestId.current) return false
-      setError(queryError)
-      if (!append) setWallpapers([])
+      if (append) {
+        setLoadMoreError(loadError)
+      } else {
+        setError(loadError)
+        setWallpapers([])
+      }
       setLoading(false)
       setLoadingMore(false)
       return false
     }
-  }, [category, categorySlug, orientation, search, sort, isDefaultCatalog])
+  }, [apiCategory, effectiveQuery, isDefaultCatalog, orientation, sort])
 
   useEffect(() => {
     requestId.current += 1
-    const timer = window.setTimeout(() => {
-      loadBatch(0, false)
-    }, search ? 250 : 0)
-
+    setPage(1)
+    wallpapersRef.current = []
+    const timer = window.setTimeout(() => loadPage(1), search ? 250 : 0)
     return () => window.clearTimeout(timer)
-  }, [loadBatch, search])
+  }, [loadPage, search])
 
   const loadMore = useCallback(async () => {
     if (loading || loadingMore || !hasMore) return
-    await loadBatch(wallpapers.length, true)
-  }, [hasMore, loadBatch, loading, loadingMore, wallpapers.length])
+    await loadPage(page + 1, true)
+  }, [hasMore, loadPage, loading, loadingMore, page])
 
-  return { wallpapers, loading, loadingMore, error, hasMore, totalCount, loadMore, batchSize: BATCH_SIZE }
+  const retry = useCallback(() => loadPage(1), [loadPage])
+
+  return {
+    wallpapers,
+    loading,
+    loadingMore,
+    error,
+    loadMoreError,
+    retry,
+    hasMore,
+    totalCount,
+    loadMore,
+    batchSize: BATCH_SIZE,
+  }
 }

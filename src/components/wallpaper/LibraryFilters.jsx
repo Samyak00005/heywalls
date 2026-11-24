@@ -12,7 +12,7 @@ const SORT_OPTIONS = [
   { value: "newest", label: "Newest first" },
   { value: "oldest", label: "Oldest first" },
   { value: "title", label: "Title A–Z" },
-  { value: "downloads", label: "Most downloaded" },
+  { value: "views", label: "Most viewed" },
 ];
 
 export const DEFAULT_LIBRARY_FILTERS = {
@@ -41,8 +41,7 @@ export function applyLibraryFilters(items, filters) {
       return new Date(a.createdAt || 0) - new Date(b.createdAt || 0);
     if (filters.sort === "title")
       return (a.title || "").localeCompare(b.title || "");
-    if (filters.sort === "downloads")
-      return (b.downloadCount || 0) - (a.downloadCount || 0);
+    if (filters.sort === "views") return (b.views || 0) - (a.views || 0);
     return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
   });
 }
@@ -98,7 +97,7 @@ export default function LibraryFilters({
           <input
             value={filters.query}
             onChange={(e) => update("query", e.target.value)}
-            placeholder="Search title, category or uploader…"
+            placeholder="Search your saved wallpapers…"
             className="admin-form-control library-search-input"
             aria-label="Search wallpapers"
           />
